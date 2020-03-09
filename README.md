@@ -6,3 +6,4 @@
 
 * OAFALLAS, Kenneth Neil B.
 * JOYA, Patrick Jaspher B.
+* CHUA CHIACO, Ronn Christian C.
