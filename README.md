@@ -5,3 +5,4 @@
 ## Team Members:
 
 * OAFALLAS, Kenneth Neil B.
+* JOYA, Patrick Jaspher B.
