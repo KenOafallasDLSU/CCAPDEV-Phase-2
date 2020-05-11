@@ -1,0 +1,25 @@
+<div id ='footer' class= 'footer'>
+            <div class ='container'>
+                <table>
+                    <tr>
+                        <th>Featured Movies</th>
+                    </tr>
+                    {{#each day1}}
+                        <tr>
+                            <td>{{this.title}}</td>
+                        </tr>
+                    {{/each}}
+                </table>
+                <table>
+                    <tr>
+                        <td><a href = '/movies'>Movies</a></td>
+                        <td><a href = '/transactions'>Transaction History</a></td>
+                        <td><a href = '#header'>Back to top</a></td>
+                    </tr>
+                </table>
+                <!-- Filler -->
+                Big Brain Movies is a project created for a requirement in the course CCAPDEV
+                <br>
+                Big Brain Movies © 2020 K. Oafallas, R. Chua Chiaco, J. Joya
+            </div>
+</div>
