@@ -1,0 +1,75 @@
+<div class=' bg-brain'>
+			<div class="container">
+				<div class='media'>
+					<a class='pull-left' href='#'>
+						<img class="media-object small-brain" method='post' src="{{img}}">
+					</a>
+					<div class='media-body'>
+						<h1 class ="text-brain">Big Brain Movies</h1>
+					</div>
+				</div>
+			</div>
+</div>
+
+<div class='container'>
+	<form name="loginForm">
+		<br>
+		<div class="form-group">
+			<label>Email</label>
+			<input name='emaillog' type='email' placeholder='Enter Your Email' id='emaillog' class='form-control'></input>
+		</div>
+		<div class="form-group">
+			<label>Password</label>
+			<input name='passlog' type='password' placeholder='Enter Your Password' id='passlog' class='form-control'></input>
+		</div>
+		<input style='background-color: #3E6F71; border-color: #3E6F71; color: white;' class="btn btn-sm" type='button' value='Log In' id="login"></input>
+		<br>
+		<a href="" data-toggle="modal" data-target="#registerForm"> I am not a user yet.</a>
+	</form>
+</div>
+
+<div class="modal fade" id="registerForm" tabindex="-1" role="dialog" aria-labelledby="registerTitle" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="registerTitle">Not a user yet? Create an account now!</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+				<form name="registerform">
+					<div class="form-group">
+						<label>First Name</label>
+						<input id='fname' type='text' placeholder='Enter Your First Name' class="form-control"></input>
+					</div>
+					<div class="form-group">
+						<label>Last Name</label>
+						<input id='lname' type='text' placeholder='Enter Your Last Name' class="form-control"></input>
+					</div>
+					<div class="form-group">
+						<label>Email</label>
+						<input id='emailreg' type='email' placeholder='Enter Your Email' class="form-control"></input>
+					</div>
+					<div class="form-group">
+						<label>Password</label>
+						<input id='passreg' type='password' placeholder='Enter Your Password' class="form-control"></input>
+					</div>
+					<div class="form-group">
+						<label><small>I am an employee of Big Brain Movies</small></label>
+						<input id='employee' type='checkbox'></input>
+					</div>
+					<input style='background-color: #3E6F71; border-color: #3E6F71; color: white;' class="btn-block btn" type="button" value="Register" id='reg'></input>
+				</form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class='container fixed-bottom'>
+	<hr>
+  <p class='text-muted'>
+    Big Brain Movies is a project created for a requirement in the course CCAPDEV <br>
+    Big Brain Movies © 2020 K. Oafallas, R. Chua Chiaco, J. Joya
+  </p>
+</div>
