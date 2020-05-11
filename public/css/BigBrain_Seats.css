@@ -1,0 +1,123 @@
+*, *:before, *:after {
+  box-sizing: border-box;
+}
+html {
+  font-size: 16px;
+}
+#seatplan {
+  margin: auto;
+  max-width: 600px;
+  
+  padding-bottom: 30px;
+}
+#seatplan {
+  margin-top: 30px;
+  max-height: 800px;
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+/*  border: 5px solid #d8d8d8;*/
+}
+
+#movieInfo {
+  margin-top: 30px;
+    display: block;
+}
+
+#poster{
+    width: 200px;
+    margin-right: 30px;
+}
+
+#title{
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+#screen{
+  background-color: black;
+  color: whitesmoke;
+  margin-bottom: 20px;
+}
+
+#seatSubmit{
+  background-color: #3E6F71;
+  border-color: #3E6F71;
+}
+
+ol {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .seats {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+  }
+  .seat {
+    display: flex;
+    flex: 0 0 50px;
+    padding: 5px;
+    position: relative;
+  }
+  .seat:nth-child(5) {
+    margin-right: 14.2857142857%;
+  }
+  .seat input[type=checkbox] {
+    position: absolute;
+    opacity: 0;
+  }
+  .seat input[type=checkbox]:checked + label {
+    background: #FFF16E;
+  }
+  .seat input[type=checkbox]:disabled + label {
+    background: #FF6262;
+  /*  text-indent: -9999px;
+    overflow: hidden;*/
+  }
+  .seat input[type=checkbox]:disabled + label:after {
+ /*   content: "X";
+    text-indent: 0;*/
+    position: absolute;
+    top: 4px;
+    left: 50%;
+    transform: translate(-50%, 0%);
+  }
+  .seat input[type=checkbox]:disabled + label:hover {
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+  .seat label {
+    display: block;
+    position: relative;
+    width: 100%;
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 1.5rem;
+    padding: 4px 0;
+    background: #03EE1A;
+    border-radius: 5px;
+  }
+  .seat label:before {
+    content: "";
+    position: absolute;
+    width: 75%;
+    height: 75%;
+    top: 1px;
+    left: 50%;
+    transform: translate(-50%, 0%);
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 3px;
+  }
+  .seat label:hover {
+    cursor: pointer;
+    box-shadow: 0 0 0px 2px #5C6AFF;
+  }
+
+  #seatSubmit:disabled:hover {
+    box-shadow: none;
+    cursor: not-allowed;
+  }

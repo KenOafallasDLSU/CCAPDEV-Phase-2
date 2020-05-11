@@ -1,0 +1,31 @@
+@import url('https://fonts.googleapis.com/css?family=VT323&display=swap');
+
+.vl {
+    border-right: 3px solid #FF919F;
+    height: 40px;
+}
+
+.navbar-custom { 
+    background-color: #FFD9EF; 
+} 
+  
+.navbar-custom .navbar-brand{
+    color: #FF919F;
+    font-family: 'VT323';
+    font-size: 25px;
+}
+
+.navbar-custom .navbar-text,  
+.navbar-custom .nav-link{ 
+    color: #00093D; 
+} 
+
+.navbar-toggler{
+    background-color: #3E6F71;
+  border-color: #3E6F71;
+}
+
+.navbar-toggler-icon{
+    background-color: #3E6F71;
+  border-color: #3E6F71;
+}
