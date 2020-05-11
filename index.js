@@ -294,7 +294,7 @@ app.post("/updateReservedSeats", function(req, res) {
 /************************ */
 
 /************Ken Displays */
-app.get("/", function(req, res) {
+app.get("/seatSelection", function(req, res) {
     mongoClient.connect(databaseURL, options, function(err, client) {
       if(err) throw err;
       const dbo = client.db(dbname);
