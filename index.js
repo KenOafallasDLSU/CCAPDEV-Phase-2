@@ -251,6 +251,7 @@ app.post("/addSeats", function(req, res) {
   });
 });
 
+/*
 app.post("/updateReservedSeats", function(req, res) {
   mongoClient.connect(databaseURL, options, function(err, client) {
     if(err) throw err;
@@ -265,7 +266,7 @@ app.post("/updateReservedSeats", function(req, res) {
     });
   });
 });
-  
+  */
   /*
   app.post("/searchScreensOnDay", function(req, res) {
     var queryDate = new Date();
