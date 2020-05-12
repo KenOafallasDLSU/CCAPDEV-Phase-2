@@ -1,0 +1,28 @@
+{
+  "name": "ccapdev-phase-2",
+  "version": "1.0.0",
+  "description": "Personal repository for CCAPDEV Phase 2, a movie reservation web application",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KenOafallasDLSU/CCAPDEV-Phase-2.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/KenOafallasDLSU/CCAPDEV-Phase-2/issues"
+  },
+  "homepage": "https://github.com/KenOafallasDLSU/CCAPDEV-Phase-2#readme",
+  "dependencies": {
+    "ejs": "^3.0.2",
+    "express": "^4.17.1",
+    "express-handlebars": "^3.1.0",
+    "handlebars": "^4.7.3",
+    "mongoose": "^5.9.7",
+    "multer": "^1.4.2",
+    "multer-gridfs-storage": "^4.0.3"
+  }
+}
