@@ -335,6 +335,10 @@ app.get("/seatSelection", function(req, res) {
 });
   
 app.get("/employeeFacing", function(req, res) {
+  mongoClient.connect(databaseURL, options, function(err, client) {
+    if(err) throw err;
+    const dbo = client.db(dbname);
+
     //user's name
     dbo.collection("users").findOne({"_id": ObjectId("3eaeb86894873f1464ff4d00"/*hardcoded user*/)}, function(err, resultUser) {
       if(err) throw err;
@@ -354,6 +358,7 @@ app.get("/employeeFacing", function(req, res) {
         footer: "BigBrain_EmployeeFooter"
       });
     });
+  });
 });
 
 /************************ */
