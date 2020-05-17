@@ -266,35 +266,12 @@ app.post("/updateReservedSeats", function(req, res) {
     });
   });
 });
-  */
-  /*
-  app.post("/searchScreensOnDay", function(req, res) {
-    var queryDate = new Date();
+*/
 
-    var query = {
-      date: queryDate
-    }
-
-    mongoClient.connect(databaseURL, options, function(err, client) {
-      if(err) throw err;
-
-      // Connect to the same database
-      const dbo = client.db(dbname);
-
-      dbo.collection("screenings").find(query).toArray(function(err, result) {
-        if(err) throw err;
-
-        client.close();
-
-        res.send(result);
-      });
-    });
-  });
-  */
 /************************ */
 
 /************Ken Displays */
-app.get("/seatSelection", function(req, res) {
+app.get("/", function(req, res) {
     mongoClient.connect(databaseURL, options, function(err, client) {
       if(err) throw err;
       const dbo = client.db(dbname);
@@ -433,7 +410,7 @@ app.post('/searchScreening', function(req, res) {
 /************************ */
 
 /************Ronn Displays */
-app.get('/', function(req, res) {
+app.get('/home', function(req, res) {
     res.render('login', {
       layout: 'home',
       img: 'img/brain.png',
