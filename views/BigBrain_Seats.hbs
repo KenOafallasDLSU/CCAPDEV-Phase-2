@@ -3,25 +3,22 @@
             <h1 id="screenNum">Screen {{screening.screenNum}}</h1>
 
             <!--Poster-->
-            <img id="poster" src="" class="float-left">
+            <img id="poster" src="img/captainalex.jpg" class="float-left">
 
             <!--Title-->
             <div class="container" id="title">
-                <p>
-                  {{screening.title}}
-                </p>
+                <p>{{screening.title}}</p>
             </div>
 
             <!--Description-->
             <div class="container text-justify" id="description">
-                <p>
-                  {{screening.desc}}
-                </p>
+                <p>{{screening.desc}}</p>
             </div>
             
             <!--Date and Time Slot-->
             <div class="container" id="slot">
-                {{screening.date}}     {{slot.slotStart}}
+                {{screening.date}}
+                {{slot.slotStart}}
             </div>
 
             <!--Duration-->
@@ -40,11 +37,11 @@
 
 
         <!--Seat Selection-->
-        <div class="container" id="seatplan">
+        <div class="container clearfix" id="seatplan">
             <h2>Select Seats</h2>
             <h2 id="screen">SCREEN</h2>
 
-            <form name="seatSelectionForm" action="employeeFacing" onsubmit="return checkSeatForm()">
+            <form name="seatSelectionForm" action="checkout" onsubmit="return checkSeatForm()">
             <ol>
             <!--Row A-->
             <li>
