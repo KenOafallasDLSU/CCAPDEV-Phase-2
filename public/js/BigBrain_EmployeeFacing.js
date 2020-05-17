@@ -394,15 +394,6 @@ $(document).ready(function() {
                 }
             });
 
-            $.post("addSlots", screeningInfo, function(data, status) {
-                if(data.success) {
-                }
-            });
-
-            $.post("addSeats", screeningInfo, function(data, status) {
-                if(data.success) {
-                }
-            });
         } else {
             alert("Screen Movie Information Too Full");
         }       

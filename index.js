@@ -14,8 +14,8 @@ const port = 3000;
 
 //Define all database connection constants
 const mongoClient = mongodb.MongoClient;
-const databaseURL = "mongodb://localhost:27017/mpdb";
-const dbname = "mpdb";
+const databaseURL = "mongodb+srv://OafallasKenneth:a1b2c3d4@ccapdev-mp-bigbrainmovies-mubsx.gcp.mongodb.net/test?retryWrites=true&w=majority";
+const dbname = "BigBrainDB";
 
 //models
 const userModel = require('./models/users');
@@ -126,6 +126,9 @@ app.post("/addScreening", function(req, res) {
     rating: req.body.rating,
     duration: req.body.duration,
     price: req.body.price,
+    time1: req.body.time1start,
+    time2: req.body.time2start,
+    time3: req.body.time3start
   });
 
   mongoClient.connect(databaseURL, options, function(err, client) {
@@ -135,116 +138,80 @@ app.post("/addScreening", function(req, res) {
     dbo.collection("screenings").insertOne(screening, function(err, res) {
       if (err) throw err;
         //console.log("1 screening inserted");
-      client.close();
-    });
-  });
-});
+        //client.close();
 
-app.post("/addSlots", function(req, res) {
-  const screening = new screeningModel({
-    date: req.body.date,
-    screenNum: req.body.screenNum,
-    title: req.body.title,
-      //poster
-    desc: req.body.desc,
-    rating: req.body.rating,
-    duration: req.body.duration,
-    price: req.body.price,
-  });
+        dbo.collection("screenings").findOne({date: screening.date, screenNum: screening.screenNum}, function(err, result) {
+          if(err) throw err;
+    
+          var screeningId;
+          screeningId = result._id;
+    
+          const slot1 = new slotModel({
+            screening: screeningId,
+            slotOrder: 1,
+            slotStart: req.body.time1start,
+            slotEnd: req.body.time1end
+          });
+          const slot2 = new slotModel({
+            screening: screeningId,
+            slotOrder: 2,
+            slotStart: req.body.time2start,
+            slotEnd: req.body.time2end
+          });
+          const slot3 = new slotModel({
+            screening: screeningId,
+            slotOrder: 3,
+            slotStart: req.body.time3start,
+            slotEnd: req.body.time3end
+          });
+    
+          dbo.collection("slots").insertMany([slot1, slot2, slot3], function(err, res) {
+            if (err) throw err;
+            //console.log("3 slots inserted");
+            //client.close();
 
-  mongoClient.connect(databaseURL, options, function(err, client) {
-    if(err) throw err;
-    const dbo = client.db(dbname);
-
-    dbo.collection("screenings").findOne({date: screening.date, screenNum: screening.screenNum}, function(err, result) {
-      if(err) throw err;
-
-      var screeningId;
-      screeningId = result._id;
-
-      const slot1 = new slotModel({
-        screening: screeningId,
-        slotOrder: 1,
-        slotStart: req.body.time1start,
-        slotEnd: req.body.time1end
-      });
-      const slot2 = new slotModel({
-        screening: screeningId,
-        slotOrder: 2,
-        slotStart: req.body.time2start,
-        slotEnd: req.body.time2end
-      });
-      const slot3 = new slotModel({
-        screening: screeningId,
-        slotOrder: 3,
-        slotStart: req.body.time3start,
-        slotEnd: req.body.time3end
-      });
-
-      dbo.collection("slots").insertMany([slot1, slot2, slot3], function(err, res) {
-        if (err) throw err;
-        //console.log("3 slots inserted");
-        client.close();
-      });
-    });
-  });
-});
-
-app.post("/addSeats", function(req, res) {
-  const screening = new screeningModel({
-    date: req.body.date,
-    screenNum: req.body.screenNum,
-    title: req.body.title,
-      //poster
-    desc: req.body.desc,
-    rating: req.body.rating,
-    duration: req.body.duration,
-    price: req.body.price,
-  });
-
-  mongoClient.connect(databaseURL, options, function(err, client) {
-    if(err) throw err;
-    const dbo = client.db(dbname);
-
-    dbo.collection("screenings").findOne({date: screening.date, screenNum: screening.screenNum}, function(err, result1) {
-      if(err) throw err;
-      var screeningId;
-      screeningId = result1._id;
-
-      dbo.collection("slots").find({screening: screeningId}).toArray(function(err, result2) {
-        if (err) throw err;
-
-        console.log(result2);
-
-        var aSeats = [];
-        var letter = 'A';
-        var number = 1;
-
-        var i = 0, j = 0, slotNum = 0;
-        for(slotNum = 0; slotNum < 3; slotNum++)
-        {
-          letter = 'A';
-          number = 1;
-
-          for(i = 0; i < 10; i++)
-          {
-            for(j = 0; j < 10; j++)
-            {
-              var tempSeat = seatModel({
-                seatNum: String.fromCharCode(letter.charCodeAt() + i).concat(number + j),
-                status: "A",
-                slot: result2[slotNum]._id
+            dbo.collection("screenings").findOne({date: screening.date, screenNum: screening.screenNum}, function(err, result1) {
+              if(err) throw err;
+              var screeningId;
+              screeningId = result1._id;
+        
+              dbo.collection("slots").find({screening: screeningId}).toArray(function(err, result2) {
+                if (err) throw err;
+        
+                //console.log(result2);
+        
+                var aSeats = [];
+                var letter = 'A';
+                var number = 1;
+        
+                var i = 0, j = 0, slotNum = 0;
+                for(slotNum = 0; slotNum < 3; slotNum++)
+                {
+                  letter = 'A';
+                  number = 1;
+        
+                  for(i = 0; i < 10; i++)
+                  {
+                    for(j = 0; j < 10; j++)
+                    {
+                      var tempSeat = seatModel({
+                        seatNum: String.fromCharCode(letter.charCodeAt() + i).concat(number + j),
+                        status: "A",
+                        slot: result2[slotNum]._id
+                      });
+        
+                      aSeats.push(tempSeat);
+                    }
+                  }
+                }
+        
+                dbo.collection("seats").insertMany(aSeats, function(err, res) {
+                  if (err) throw err;
+                  //console.log("300 seats inserted");
+                  client.close();
+                });
               });
-
-              aSeats.push(tempSeat);
-            }
-          }
-        }
-
-        dbo.collection("seats").insertMany(aSeats, function(err, res) {
-          if (err) throw err;
-          //console.log("300 seats inserted");
-          client.close();
+          });
         });
       });
     });
@@ -271,7 +238,7 @@ app.post("/updateReservedSeats", function(req, res) {
 /************************ */
 
 /************Ken Displays */
-app.get("/", function(req, res) {
+app.get("/seatSelection", function(req, res) {
     mongoClient.connect(databaseURL, options, function(err, client) {
       if(err) throw err;
       const dbo = client.db(dbname);
@@ -410,7 +377,7 @@ app.post('/searchScreening', function(req, res) {
 /************************ */
 
 /************Ronn Displays */
-app.get('/home', function(req, res) {
+app.get('/', function(req, res) {
     res.render('login', {
       layout: 'home',
       img: 'img/brain.png',
