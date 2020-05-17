@@ -251,7 +251,7 @@ app.get("/seatSelection", function(req, res) {
           if(err) throw err;
           var slot = result2;
 
-          dbo.collection("users").findOne({"_id": ObjectId("3eaeb86894873f1464ff4d00"/*hardcoded user*/)}, function(err, resultUser) {
+          dbo.collection("users").findOne({"_id": ObjectId("3eaeb86894873f1464ff4d00"/*hardcoded client user*/)}, function(err, resultUser) {
             if(err) throw err;
             var user = resultUser;
 
@@ -284,7 +284,7 @@ app.get("/employeeFacing", function(req, res) {
     const dbo = client.db(dbname);
 
     //user's name
-    dbo.collection("users").findOne({"_id": ObjectId("3eaeb86894873f1464ff4d00"/*hardcoded user*/)}, function(err, resultUser) {
+    dbo.collection("users").findOne({"_id": ObjectId("5ec0cd81474d4f15d0f4fd0a"/*hardcoded employee user*/)}, function(err, resultUser) {
       if(err) throw err;
       var user = resultUser;
 
