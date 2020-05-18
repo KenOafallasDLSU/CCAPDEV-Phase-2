@@ -14,7 +14,7 @@ const port = 3000;
 
 //Define all database connection constants
 const mongoClient = mongodb.MongoClient;
-const databaseURL = "mongodb+srv://OafallasKenneth:a1b2c3d4@ccapdev-mp-bigbrainmovies-mubsx.gcp.mongodb.net/test?retryWrites=true&w=majority";
+const databaseURL = "mongodb+srv://OafallasKenneth:a1b2c3d4@ccapdev-mp-bigbrainmovies-mubsx.gcp.mongodb.net/BigBrainDB?retryWrites=true&w=majority";
 const dbname = "BigBrainDB";
 
 //models
@@ -142,10 +142,10 @@ app.post("/addScreening", function(req, res) {
 
         dbo.collection("screenings").findOne({date: screening.date, screenNum: screening.screenNum}, function(err, result) {
           if(err) throw err;
-    
+
           var screeningId;
           screeningId = result._id;
-    
+
           const slot1 = new slotModel({
             screening: screeningId,
             slotOrder: 1,
@@ -164,7 +164,7 @@ app.post("/addScreening", function(req, res) {
             slotStart: req.body.time3start,
             slotEnd: req.body.time3end
           });
-    
+
           dbo.collection("slots").insertMany([slot1, slot2, slot3], function(err, res) {
             if (err) throw err;
             //console.log("3 slots inserted");
@@ -174,22 +174,22 @@ app.post("/addScreening", function(req, res) {
               if(err) throw err;
               var screeningId;
               screeningId = result1._id;
-        
+
               dbo.collection("slots").find({screening: screeningId}).toArray(function(err, result2) {
                 if (err) throw err;
-        
+
                 //console.log(result2);
-        
+
                 var aSeats = [];
                 var letter = 'A';
                 var number = 1;
-        
+
                 var i = 0, j = 0, slotNum = 0;
                 for(slotNum = 0; slotNum < 3; slotNum++)
                 {
                   letter = 'A';
                   number = 1;
-        
+
                   for(i = 0; i < 10; i++)
                   {
                     for(j = 0; j < 10; j++)
@@ -199,12 +199,12 @@ app.post("/addScreening", function(req, res) {
                         status: "A",
                         slot: result2[slotNum]._id
                       });
-        
+
                       aSeats.push(tempSeat);
                     }
                   }
                 }
-        
+
                 dbo.collection("seats").insertMany(aSeats, function(err, res) {
                   if (err) throw err;
                   //console.log("300 seats inserted");
@@ -364,7 +364,7 @@ app.post('/searchScreening', function(req, res) {
   screeningModel.find({date: req.body.date}, function(err, screenings){
     var result = {cont: screenings, empty: true};
     if (err)
-      console.log('There is an error when searching for a user.');
+      console.log('There is an error when searching for a screenings.');
     console.log("Screenings: " + screenings);
     if(screenings == null)
       result.empty = true;
@@ -392,31 +392,46 @@ app.get('/movies', function(req, res) {
     var screens2 = [];
     var screens3 = [];
 
-    screeningModel.find({date: today}).sort({date: 1}).exec(function(err, result){
-      result.forEach(function(doc) {
-        screens1.push(doc.toObject());
-      });
-    });
-    screeningModel.find({date: tom}).sort({date: 1}).exec(function(err, result){
-      result.forEach(function(doc) {
-        screens2.push(doc.toObject());
-      });
-    });
-    screeningModel.find({date: next}).sort({date: 1}).exec(function(err, result){
-      result.forEach(function(doc) {
-        screens3.push(doc.toObject());
-      });
-    });
+    mongoClient.connect(databaseURL, options, function(err, client) {
+      if(err) throw err;
+      const dbo = client.db(dbname);
 
-      res.render('movies', {
-        layout: 'moviescreenings',
-        day1: screens1,
-        day2: screens2,
-        day3: screens3,
-        date1: today.toDateString(),
-        date2: tom.toDateString(),
-        date3: next.toDateString()
+      screeningModel.find({date: today}).sort({date: 1}).exec(function(err, result){
+          result.forEach(function(doc) {
+          screens1.push(doc.toObject());
+        });
+        screeningModel.find({date: tom}).sort({date: 1}).exec(function(err, result){
+            result.forEach(function(doc) {
+            screens2.push(doc.toObject());
+          });
+          screeningModel.find({date: next}).sort({date: 1}).exec(function(err, result){
+              result.forEach(function(doc) {
+              screens3.push(doc.toObject());
+          });
+          dbo.collection("users").findOne({"_id": ObjectId("3eaeb86894873f1464ff4d00"/*hardcoded employee user*/)}, function(err, resultUser) {
+            if(err) throw err;
+            var user = resultUser;
+
+            client.close();
+            res.render('movies', {
+              user: user,
+              pageCSS: "BigBrain_Screenings",
+              pageJS: "",
+              pageTitle: "Movie Screenings",
+              header: "header",
+              footer: "footer",
+              day1: screens1,
+              day2: screens2,
+              day3: screens3,
+              date1: today.toDateString(),
+              date2: tom.toDateString(),
+              date3: next.toDateString()
+            });
+          });
+        });
       });
+      });
+    });
 });
 /************************ */
 
