@@ -218,6 +218,26 @@ app.post("/addScreening", function(req, res) {
   });
 });
 
+app.post('/getSeatStatus', function(req, res) {
+  var query = {
+    slot:ObjectId(req.body.slot) 
+  };
+
+    mongoClient.connect(databaseURL, options, function(err, client) {
+      if(err) throw err;
+
+      const dbo = client.db(dbname);
+  
+      dbo.collection("seats").find(query).toArray(function(err, result) {
+        if(err) throw err;
+
+        client.close();
+
+        res.send(result);
+      });
+    });
+});
+
 /*
 app.post("/updateReservedSeats", function(req, res) {
   mongoClient.connect(databaseURL, options, function(err, client) {
