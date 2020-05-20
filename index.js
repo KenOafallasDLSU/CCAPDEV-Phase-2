@@ -238,22 +238,18 @@ app.post('/getSeatStatus', function(req, res) {
     });
 });
 
-/*
-app.post("/updateReservedSeats", function(req, res) {
+app.post("/reserveSeats", function(req, res) {
   mongoClient.connect(databaseURL, options, function(err, client) {
     if(err) throw err;
     const dbo = client.db(dbname);
 
-    console.log(req.body);
-
-    dbo.collection("seats").updateMany({seatNum: req.body}, {$set: {status: "R"}}, function(err, result) {
+    dbo.collection("seats").updateMany({slot: ObjectId(req.body.slot), seatNum: {$in: req.body.reservedSeats}}, {$set: {status: "R", owner: ObjectId("3eaeb86894873f1464ff4d00"/*hardcoded client user*/)}}, function(err, result) {
       if (err) throw err;
 
       client.close();
     });
   });
 });
-*/
 
 /************************ */
 

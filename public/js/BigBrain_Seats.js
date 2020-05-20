@@ -50,7 +50,7 @@ $(document).ready(function() {
 
         if(checkSeatForm() == true)
         {
-            $.post("updateReservedSeats", reservedSeats, function(data, status) {
+            $.post("reserveSeats", {slot: localStorage.getItem("selectedSlot"), reservedSeats: reservedSeats}, function(data, status) {
                 if(data.success) {
                 }
             });
