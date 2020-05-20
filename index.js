@@ -218,6 +218,26 @@ app.post("/addScreening", function(req, res) {
   });
 });
 
+app.post('/getSeatStatus', function(req, res) {
+  var query = {
+    slot:ObjectId(req.body.slot) 
+  };
+
+    mongoClient.connect(databaseURL, options, function(err, client) {
+      if(err) throw err;
+
+      const dbo = client.db(dbname);
+  
+      dbo.collection("seats").find(query).toArray(function(err, result) {
+        if(err) throw err;
+
+        client.close();
+
+        res.send(result);
+      });
+    });
+});
+
 /*
 app.post("/updateReservedSeats", function(req, res) {
   mongoClient.connect(databaseURL, options, function(err, client) {
@@ -239,17 +259,19 @@ app.post("/updateReservedSeats", function(req, res) {
 
 /************Ken Displays */
 app.get("/seatSelection", function(req, res) {
+  var currSlotId = localStorage.getItem("selectedSlot")
+
     mongoClient.connect(databaseURL, options, function(err, client) {
       if(err) throw err;
       const dbo = client.db(dbname);
 
-      dbo.collection("screenings").findOne({"_id": ObjectId("5eaeb86894873f1464ff4cfa"/*hardcoded screening*/)}, function(err, result1) {
+      dbo.collection("slots").findOne({"_id": ObjectId(currSlotId)}, function(err, result1) {
         if(err) throw err;
-        var screening = result1;
+        var slot = result1;
 
-        dbo.collection("slots").findOne({screening: screening._id, slotOrder: 1}, function(err, result2) {
+        dbo.collection("screenings").findOne({"_id": slot.screening}, function(err, result2) {
           if(err) throw err;
-          var slot = result2;
+          var screening = result2;
 
           dbo.collection("users").findOne({"_id": ObjectId("3eaeb86894873f1464ff4d00"/*hardcoded client user*/)}, function(err, resultUser) {
             if(err) throw err;

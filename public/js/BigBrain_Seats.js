@@ -12,27 +12,12 @@ function checkSeatForm(){
 }
 
 $(document).ready(function() {
-    /*
-    var i = 0, j = 0;
-    for(i = 0; i < 10; i++)
-    {
-        for(j = 0; j < 10; j++)
-         {
-            $("#".concat(String.fromCharCode(letter.charCodeAt() + i).concat(number + j))).attr("disabled", true);
-
-                
-                $.post("getSeatStatus", screeningInfo, function(data, status) {
-                    if(data.success) {
-                        if(result.status == "D")
-                        {
-                            $($String.fromCharCode(letter.charCodeAt() + i).concat(number + j)).attr("disabled", true);
-                        }
-                    }
-                });
-                
-        }
-    }
-    */
+    $.post("getSeatStatus", {slot: localStorage.getItem("selectedSlot")}, function(data, status) {
+        data.forEach((item, i) => {
+            if(item.status == "U" || item.status == "R")
+                $("#".concat(item.seatNum)).attr("disabled", true);
+        });
+    });   
 
     if($("input[type=checkbox]:disabled").length == 100)
     {
@@ -47,17 +32,19 @@ $(document).ready(function() {
         $("#noSeatAlert").removeClass("alert alert-danger col-12");
     });
 
-    /*
     $("#seatSubmit").click(function(){
         var reservedSeats = [];
 
-        i = 0; j = 0;
+        var i = 0, j = 0;
+        var letter = 'A';
+        var number = 1;
+
         for(i = 0; i < 10; i++)
         {
             for(j = 0; j < 10; j++)
             {
-                if(//its checked)
-                    reservedSeats.push(//The id);
+                if($("#".concat(String.fromCharCode(letter.charCodeAt() + i).concat(number + j))).checked)
+                    reservedSeats.push(String.fromCharCode(letter.charCodeAt() + i).concat(number + j));
             }
         }
 
@@ -69,5 +56,4 @@ $(document).ready(function() {
             });
         }
     });
-    */
 });
