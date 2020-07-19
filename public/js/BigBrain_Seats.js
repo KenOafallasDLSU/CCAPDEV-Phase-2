@@ -12,7 +12,7 @@ function checkSeatForm(){
 }
 
 $(document).ready(function() {
-    $.post("getSeatStatus", {slot: localStorage.getItem("selectedSlot")}, function(data, status) {
+    $.post("getSeatStatus", {slot: "5ec0c846ca85a61340446897"}, function(data, status) {
         data.forEach((item, i) => {
             if(item.status == "U" || item.status == "R")
                 $("#".concat(item.seatNum)).attr("disabled", true);
@@ -50,7 +50,7 @@ $(document).ready(function() {
 
         if(checkSeatForm() == true)
         {
-            $.post("reserveSeats", {slot: localStorage.getItem("selectedSlot"), reservedSeats: reservedSeats}, function(data, status) {
+            $.post("reserveSeats", {slot: "5ec0c846ca85a61340446897", reservedSeats: reservedSeats}, function(data, status) {
                 if(data.success) {
                 }
             });

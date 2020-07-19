@@ -255,7 +255,7 @@ app.post("/reserveSeats", function(req, res) {
 
 /************Ken Displays */
 app.get("/seatSelection", function(req, res) {
-  var currSlotId = localStorage.getItem("selectedSlot")
+  var currSlotId = "5ec0c846ca85a61340446897"
 
     mongoClient.connect(databaseURL, options, function(err, client) {
       if(err) throw err;
@@ -288,7 +288,8 @@ app.get("/seatSelection", function(req, res) {
 
               //body
               screening: screening,
-              slot: slot
+              slot: slot,
+              dateFormatted: screening.date.toDateString()
             });
           });
         });
