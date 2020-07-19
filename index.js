@@ -4,9 +4,9 @@ const path = require('path');
 const exphbs = require('express-handlebars');
 const handlebars = require('handlebars');
 const bodyParser = require('body-parser');
-
 const mongodb = require('mongodb');
 const ObjectId = require('mongodb').ObjectId;
+
 
 //creates express app
 const app = express();
@@ -220,14 +220,14 @@ app.post("/addScreening", function(req, res) {
 
 app.post('/getSeatStatus', function(req, res) {
   var query = {
-    slot:ObjectId(req.body.slot) 
+    slot:ObjectId(req.body.slot)
   };
 
     mongoClient.connect(databaseURL, options, function(err, client) {
       if(err) throw err;
 
       const dbo = client.db(dbname);
-  
+
       dbo.collection("seats").find(query).toArray(function(err, result) {
         if(err) throw err;
 
@@ -435,7 +435,7 @@ app.get('/movies', function(req, res) {
             res.render('movies', {
               user: user,
               pageCSS: "BigBrain_Screenings",
-              pageJS: "",
+              pageJS: "BigBrain_Screenings",
               pageTitle: "Movie Screenings",
               header: "header",
               footer: "footer",

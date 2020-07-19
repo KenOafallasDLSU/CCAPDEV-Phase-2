@@ -17,7 +17,7 @@ $(document).ready(function() {
             if(item.status == "U" || item.status == "R")
                 $("#".concat(item.seatNum)).attr("disabled", true);
         });
-    });   
+    });
 
     if($("input[type=checkbox]:disabled").length == 100)
     {
