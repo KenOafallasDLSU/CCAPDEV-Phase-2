@@ -12,17 +12,18 @@
 </div>
 
 <div class='container'>
-	<form name="loginForm">
+	{{>messages}}
+	<form name="loginForm" action="/user-login" method="POST">
 		<br>
 		<div class="form-group">
 			<label>Email</label>
-			<input name='emaillog' type='email' placeholder='Enter Your Email' id='emaillog' class='form-control'></input>
+			<input name='emaillog' type='email' placeholder='Enter Your Email' id='emaillog' name='emaillog' class='form-control'></input>
 		</div>
 		<div class="form-group">
 			<label>Password</label>
-			<input name='passlog' type='password' placeholder='Enter Your Password' id='passlog' class='form-control'></input>
+			<input name='passlog' type='password' placeholder='Enter Your Password' id='passlog' name='passlog' class='form-control'></input>
 		</div>
-		<input style='background-color: #3E6F71; border-color: #3E6F71; color: white;' class="btn btn-sm" type='button' value='Log In' id="login"></input>
+		<button style='background-color: #3E6F71; border-color: #3E6F71; color: white;' class="btn btn-sm" value='Log In' id="login">Login</button>
 		<br>
 		<a href="" data-toggle="modal" data-target="#registerForm"> I am not a user yet.</a>
 	</form>
@@ -38,28 +39,31 @@
         </button>
       </div>
       <div class="modal-body">
-				<form name="registerform">
+				<form name="registerform" action="/user-register" method="POST">
 					<div class="form-group">
 						<label>First Name</label>
-						<input id='fname' type='text' placeholder='Enter Your First Name' class="form-control"></input>
+						<input id='fname' name='fname' type='text' placeholder='Enter Your First Name' class="form-control"></input>
 					</div>
 					<div class="form-group">
 						<label>Last Name</label>
-						<input id='lname' type='text' placeholder='Enter Your Last Name' class="form-control"></input>
+						<input id='lname' name='lname' type='text' placeholder='Enter Your Last Name' class="form-control"></input>
 					</div>
 					<div class="form-group">
 						<label>Email</label>
-						<input id='emailreg' type='email' placeholder='Enter Your Email' class="form-control"></input>
+						<input id='emailreg' name='emailreg' type='email' placeholder='Enter Your Email' class="form-control"></input>
 					</div>
 					<div class="form-group">
 						<label>Password</label>
-						<input id='passreg' type='password' placeholder='Enter Your Password' class="form-control"></input>
+						<input id='passreg' name='passreg' type='password' placeholder='Enter Your Password' class="form-control"></input>
 					</div>
 					<div class="form-group">
-						<label><small>I am an employee of Big Brain Movies</small></label>
-						<input id='employee' type='checkbox'></input>
+						<button type="button" class="btn btn-dark" id="employee-btn">I am an Employee</button>
+						<button type="button" class="btn btn-dark" id="user-btn">I am a Customer</button>
 					</div>
-					<input style='background-color: #3E6F71; border-color: #3E6F71; color: white;' class="btn-block btn" type="button" value="Register" id='reg'></input>
+					<div class="form-group">
+						<input type="text" class="form-control" id="typeuser" name="typeuser" value="" hidden>
+					</div>
+					<button style='background-color: #3E6F71; border-color: #3E6F71; color: white;' class="btn-block btn" value="Register" id='reg'>Register</button>
 				</form>
       </div>
     </div>

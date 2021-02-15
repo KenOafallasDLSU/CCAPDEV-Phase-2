@@ -1,16 +1,23 @@
 //requirements
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const exphbs = require('express-handlebars');
 const handlebars = require('handlebars');
 const bodyParser = require('body-parser');
 const mongodb = require('mongodb');
+const mongoose = require('./models/connection');
+const session = require('express-session');
+const flash = require('connect-flash');
 const ObjectId = require('mongodb').ObjectId;
+const MongoStore = require('connect-mongo')(session);
+const {envPort, sessionKey} = require('./config');
+const methodOverride = require('method-override');
 
 
 //creates express app
 const app = express();
-const port = 3000;
+const port = envPort || 3000;
 
 //Define all database connection constants
 const mongoClient = mongodb.MongoClient;
@@ -18,12 +25,19 @@ const databaseURL = "mongodb+srv://OafallasKenneth:a1b2c3d4@ccapdev-mp-bigbrainm
 const dbname = "BigBrainDB";
 
 //models
-const userModel = require('./models/users');
-const screeningModel = require('./models/screenings');
+const userModel = require('./models/DB_User');
+const screeningModel = require('./models/DB_Screening');
 const slotModel = require('./models/DB_Slot');
 const seatModel = require('./models/DB_Seat');
 const transactionModel = require('./models/DB_Transaction');
 
+//others
+const bcrypt = require('bcrypt');
+const {validationResult} = require('express-validator');
+const {userRegisterValidation, userLoginValidation} = require('./validators.js');
+const options = { useUnifiedTopology: true };
+
+/*
 // additional connection options
 const options = { useUnifiedTopology: true };
 
@@ -53,6 +67,7 @@ mongoClient.connect(databaseURL, options, function(err, client) {
       });
     });
 });
+*/
 
 /*************Multer File Uploads */
 /*
@@ -114,6 +129,27 @@ app.engine('hbs', exphbs({
 app.set('view engine', 'hbs');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use(methodOverride("_method"));
+
+// sessions - server configuration
+app.use(session({
+  secret: sessionKey,
+  store: new MongoStore({mongooseConnection: mongoose.connection}),
+  resave: false,
+  saveUninitialized: true.valueOf,
+  cookie: {secure: false, maxAge: 1000 * 60 * 60 * 24 * 7}
+}));
+
+// flash
+app.use(flash());
+
+// global variable messages
+app.use((req, res, next) => {
+  res.locals.success_msg = req.flash('success_msg');
+  res.locals.error_msg = req.flash('error_msg');
+  next();
+});
 
 /************Ken Posts */
 app.post("/addScreening", function(req, res) {
@@ -324,61 +360,135 @@ app.get("/employeeFacing", function(req, res) {
   });
 });
 
-/************************ */
-
-/************Ronn Posts */
-app.post('/addUser', function(req, res) {
-  var user = new userModel({
-    first_name: req.body.first_name,
-    family_name: req.body.family_name,
-    email: req.body.email,
-    password: req.body.password,
-    usertype: req.body.usertype
-  });
-  user.save(function(err, user) {
-    var result;
-    if (err) {
-      console.log(err.errors);
-      result = {success: false, message: "User was not created. Please try again."};
-      res.send(result);
-    } else {
-      console.log("User creation success!");
-      result = {success: true, message: "User was successfully created!"};
-      res.send(result);
-    }
-  });
+/* Login Page */
+app.get('/', function(req, res) {
+    res.render('login', {
+      layout: 'home',
+      img: 'img/brain.png',
+    });
 });
 
-app.post('/searchUser', function(req, res) {
-  userModel.findOne({email: req.body.email, password: req.body.password}, function(err, user){
-    var result = {cont: user, ok: true};
-    if (err)
-      console.log('There is an error when searching for a user.');
-    console.log("User: " + user);
-    if (user == null)
-        result.ok = false;
-    else
-        result.ok = true;
-    console.log("Result: " + result.ok);
-    res.send(result);
-  });
+//login posts
+app.post('/user-register', userRegisterValidation, (req, res) => {
+  const errors = validationResult(req);
+  if(errors.isEmpty()) {
+    const {fname, lname, emailreg, passreg, typeuser} = req.body;
+    userModel.getOne({email: emailreg}, (err, result) => {
+      if(result) {
+        req.flash('error_msg', 'User already exists. Please login.');
+        res.redirect('/');
+      } else {
+        const saltRounds = 10;
+        bcrypt.hash(passreg, saltRounds, (err, hashed) => {
+          const newUser = {
+            first_name: fname,
+            family_name: lname,
+            email: emailreg,
+            password: hashed,
+            usertype: typeuser
+          };
+          userModel.create(newUser, (err, user) => {
+            if(err) {
+              req.flash('error_msg', 'Error creating new account. Please try again.');
+              res.redirect('/');
+            } else {
+              req.flash('success_msg', 'Registration successful! Please login.');
+              res.redirect('/');
+            }
+          });
+        });
+      }
+    });
+  } else {
+    const messages = errors.array().map((item) => item.msg);
+    req.flash('error_msg', messages.join(' '));
+    res.redirect('/');
+  }
 });
 
-app.post('/searchUserExist', function(req, res) {
-  userModel.findOne({email: req.body.email}, function(err, user){
-    var result;
-    if (err)
-      console.log('There is an error when searching for a user.');
-    console.log("User: " + user);
-    if (user == null)
-        result = false;
-    else
-        result = true;
-    console.log("Exist: " + result);
-    res.send(result);
-  });
+app.post('/user-login', userLoginValidation, (req, res) => {
+  const errors = validationResult(req);
+  if(errors.isEmpty()) {
+    const {emaillog, passlog} = req.body;
+    userModel.getOne({email: emaillog}, (err, user) => {
+      if(err) {
+        console.log(err); //testing
+        res.redirect('/login');
+      } else {
+        if(user) {
+          bcrypt.compare(passlog, user.password, (err, result) => {
+            if (result) {
+              req.session.user = user._id;
+              req.session.fullname = user.full_name;
+              res.redirect('/movies');
+            } else {
+              req.flash('error_msg', 'Incorrect password. Please try again.');
+              res.redirect('/');
+            }
+          });
+        } else {
+          req.flash('error_msg', 'User not found. Please try again.');
+          res.redirect('/');
+        }
+      }
+    });
+  } else {
+    const messages = errors.array().map((item) => item.msg);
+    req.flash('error_msg', messages.join(' '));
+    res.redirect('/');
+  }
 });
 
+/* Screenings Page */
+app.get('/movies', function(req, res) {
+    var today = new Date(2020, 4, 9); //hardcoded dates
+    var tom = new Date(2020, 4, 10);
+    var next = new Date(2020, 4, 11);
+    var screens1 = [];
+    var screens2 = [];
+    var screens3 = [];
+    var username;
+
+      screeningModel.getAll({date: today}, (err, result) => {
+          result.forEach(function(doc) {
+          screens1.push(doc);
+        });
+        screeningModel.getAll({date: tom}, (err, result) => {
+            result.forEach(function(doc) {
+            screens2.push(doc);
+          });
+          screeningModel.getAll({date: next}, (err, result) => {
+              result.forEach(function(doc) {
+              screens3.push(doc);
+          });
+
+          if (req.session.fullname != null)
+            username= req.session.fullname;
+          else
+            username= "guest";
+
+            console.log(req.session);
+
+            res.render('movies', {
+              user: username,
+              pageCSS: "BigBrain_Screenings",
+              pageJS: "BigBrain_Screenings",
+              pageTitle: "Movie Screenings",
+              header: "header",
+              footer: "footer",
+              day1: screens1,
+              day2: screens2,
+              day3: screens3,
+              date1: today.toDateString(),
+              date2: tom.toDateString(),
+              date3: next.toDateString()
+            });
+        });
+      });
+    });
+});
+
+//screening posts
 app.post('/searchScreening', function(req, res) {
   screeningModel.find({date: req.body.date}, function(err, screenings){
     var result = {cont: screenings, empty: true};
@@ -393,66 +503,20 @@ app.post('/searchScreening', function(req, res) {
     res.send(result);
   });
 });
-/************************ */
 
-/************Ronn Displays */
-app.get('/', function(req, res) {
-    res.render('login', {
-      layout: 'home',
-      img: 'img/brain.png',
+/*Header*/
+//for user logout
+app.get('/logout', (req, res) => {
+  if(req.session){
+    console.log(req.session);
+    req.session.destroy(() => {
+      res.clearCookie('connect.sid');
+      res.redirect('/');
     });
+  };
 });
 
-app.get('/movies', function(req, res) {
-    var today = new Date(2020, 4, 9); //hardcoded dates
-    var tom = new Date(2020, 4, 10);
-    var next = new Date(2020, 4, 11);
-    var screens1 = [];
-    var screens2 = [];
-    var screens3 = [];
 
-    mongoClient.connect(databaseURL, options, function(err, client) {
-      if(err) throw err;
-      const dbo = client.db(dbname);
-
-      screeningModel.find({date: today}).sort({date: 1}).exec(function(err, result){
-          result.forEach(function(doc) {
-          screens1.push(doc.toObject());
-        });
-        screeningModel.find({date: tom}).sort({date: 1}).exec(function(err, result){
-            result.forEach(function(doc) {
-            screens2.push(doc.toObject());
-          });
-          screeningModel.find({date: next}).sort({date: 1}).exec(function(err, result){
-              result.forEach(function(doc) {
-              screens3.push(doc.toObject());
-          });
-          dbo.collection("users").findOne({"_id": ObjectId("3eaeb86894873f1464ff4d00"/*hardcoded employee user*/)}, function(err, resultUser) {
-            if(err) throw err;
-            var user = resultUser;
-
-            client.close();
-            res.render('movies', {
-              user: user,
-              pageCSS: "BigBrain_Screenings",
-              pageJS: "BigBrain_Screenings",
-              pageTitle: "Movie Screenings",
-              header: "header",
-              footer: "footer",
-              day1: screens1,
-              day2: screens2,
-              day3: screens3,
-              date1: today.toDateString(),
-              date2: tom.toDateString(),
-              date3: next.toDateString()
-            });
-          });
-        });
-      });
-      });
-    });
-});
-/************************ */
 
 //static hosting
 app.use(express.static('public'));
