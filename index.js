@@ -447,6 +447,7 @@ app.get('/movies', function(req, res) {
     var screens1 = [];
     var screens2 = [];
     var screens3 = [];
+    var username;
 
       screeningModel.getAll({date: today}, (err, result) => {
           result.forEach(function(doc) {
@@ -460,8 +461,16 @@ app.get('/movies', function(req, res) {
               result.forEach(function(doc) {
               screens3.push(doc);
           });
+
+          if (req.session.fullname != null)
+            username= req.session.fullname;
+          else
+            username= "guest";
+
+            console.log(req.session);
+
             res.render('movies', {
-              user: req.session.fullname,
+              user: username,
               pageCSS: "BigBrain_Screenings",
               pageJS: "BigBrain_Screenings",
               pageTitle: "Movie Screenings",
