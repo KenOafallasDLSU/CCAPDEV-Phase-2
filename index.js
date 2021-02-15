@@ -1,16 +1,23 @@
 //requirements
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const exphbs = require('express-handlebars');
 const handlebars = require('handlebars');
 const bodyParser = require('body-parser');
 const mongodb = require('mongodb');
+const mongoose = require('./models/connection');
+const session = require('express-session');
+const flash = require('connect-flash');
 const ObjectId = require('mongodb').ObjectId;
+const MongoStore = require('connect-mongo')(session);
+const {envPort, sessionKey} = require('./config');
+const methodOverride = require('method-override');
 
 
 //creates express app
 const app = express();
-const port = 3000;
+const port = envPort || 3000;
 
 //Define all database connection constants
 const mongoClient = mongodb.MongoClient;
@@ -18,12 +25,19 @@ const databaseURL = "mongodb+srv://OafallasKenneth:a1b2c3d4@ccapdev-mp-bigbrainm
 const dbname = "BigBrainDB";
 
 //models
-const userModel = require('./models/users');
-const screeningModel = require('./models/screenings');
+const userModel = require('./models/DB_User');
+const screeningModel = require('./models/DB_Screening');
 const slotModel = require('./models/DB_Slot');
 const seatModel = require('./models/DB_Seat');
 const transactionModel = require('./models/DB_Transaction');
 
+//others
+const bcrypt = require('bcrypt');
+const {validationResult} = require('express-validator');
+const {userRegisterValidation, userLoginValidation} = require('./validators.js');
+const options = { useUnifiedTopology: true };
+
+/*
 // additional connection options
 const options = { useUnifiedTopology: true };
 
@@ -53,6 +67,7 @@ mongoClient.connect(databaseURL, options, function(err, client) {
       });
     });
 });
+*/
 
 /*************Multer File Uploads */
 /*
@@ -114,6 +129,27 @@ app.engine('hbs', exphbs({
 app.set('view engine', 'hbs');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use(methodOverride("_method"));
+
+// sessions - server configuration
+app.use(session({
+  secret: sessionKey,
+  store: new MongoStore({mongooseConnection: mongoose.connection}),
+  resave: false,
+  saveUninitialized: true.valueOf,
+  cookie: {secure: false, maxAge: 1000 * 60 * 60 * 24 * 7}
+}));
+
+// flash
+app.use(flash());
+
+// global variable messages
+app.use((req, res, next) => {
+  res.locals.success_msg = req.flash('success_msg');
+  res.locals.error_msg = req.flash('error_msg');
+  next();
+});
 
 /************Ken Posts */
 app.post("/addScreening", function(req, res) {
@@ -324,9 +360,52 @@ app.get("/employeeFacing", function(req, res) {
   });
 });
 
-/************************ */
+/* Login Page */
+app.get('/', function(req, res) {
+    res.render('login', {
+      layout: 'home',
+      img: 'img/brain.png',
+    });
+});
 
-/************Ronn Posts */
+//login posts
+app.post('/user-register', userRegisterValidation, (req, res) => {
+  const errors = validationResult(req);
+  if(errors.isEmpty()) {
+    const {fname, lname, emailreg, passreg, typeuser} = req.body;
+    userModel.getOne({email: emailreg}, (err, result) => {
+      if(result) {
+        req.flash('error_msg', 'User already exists. Please login.');
+        res.redirect('/');
+      } else {
+        const saltRounds = 10;
+        bcrypt.hash(passreg, saltRounds, (err, hashed) => {
+          const newUser = {
+            first_name: fname,
+            family_name: lname,
+            email: emailreg,
+            password: hashed,
+            usertype: typeuser
+          };
+          userModel.create(newUser, (err, user) => {
+            if(err) {
+              req.flash('error_msg', 'Error creating new account. Please try again.');
+              res.redirect('/');
+            } else {
+              req.flash('success_msg', 'Registration successful! Please login.');
+              res.redirect('/');
+            }
+          });
+        });
+      }
+    });
+  } else {
+    const messages = errors.array().map((item) => item.msg);
+    req.flash('error_msg', messages.join(' '));
+    res.redirect('/');
+  }
+});
+
 app.post('/addUser', function(req, res) {
   var user = new userModel({
     first_name: req.body.first_name,
@@ -379,30 +458,7 @@ app.post('/searchUserExist', function(req, res) {
   });
 });
 
-app.post('/searchScreening', function(req, res) {
-  screeningModel.find({date: req.body.date}, function(err, screenings){
-    var result = {cont: screenings, empty: true};
-    if (err)
-      console.log('There is an error when searching for a screenings.');
-    console.log("Screenings: " + screenings);
-    if(screenings == null)
-      result.empty = true;
-    else
-      result.empty = false;
-    console.log("Result: " + result.empty);
-    res.send(result);
-  });
-});
-/************************ */
-
-/************Ronn Displays */
-app.get('/', function(req, res) {
-    res.render('login', {
-      layout: 'home',
-      img: 'img/brain.png',
-    });
-});
-
+/* Scrennings Page */
 app.get('/movies', function(req, res) {
     var today = new Date(2020, 4, 9); //hardcoded dates
     var tom = new Date(2020, 4, 10);
@@ -452,7 +508,24 @@ app.get('/movies', function(req, res) {
       });
     });
 });
-/************************ */
+
+//screening posts
+app.post('/searchScreening', function(req, res) {
+  screeningModel.find({date: req.body.date}, function(err, screenings){
+    var result = {cont: screenings, empty: true};
+    if (err)
+      console.log('There is an error when searching for a screenings.');
+    console.log("Screenings: " + screenings);
+    if(screenings == null)
+      result.empty = true;
+    else
+      result.empty = false;
+    console.log("Result: " + result.empty);
+    res.send(result);
+  });
+});
+
+
 
 //static hosting
 app.use(express.static('public'));

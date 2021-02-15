@@ -1,23 +1,15 @@
-const mongoose = require('mongoose');
-const databaseURL = 'mongodb+srv://OafallasKenneth:a1b2c3d4@ccapdev-mp-bigbrainmovies-mubsx.gcp.mongodb.net/BigBrainDB?retryWrites=true&w=majority';
+const mongoose = require('./connection');
 
-const options = { useNewUrlParser: true,
-  useUnifiedTopology: true,
-  useFindAndModify: false };
-
-mongoose.connect(databaseURL, options);
-
-const ScreeningSchema = new mongoose.Schema(
+const screeningSchema = new mongoose.Schema(
   {
     date: {type: Date, required: true},
     screenNum: {type: Number, required: true, min: 1, max: 4, get: v => Math.round(v), set: v => Math.round(v)},
     title: {type: String, required: true, max: 100},
-    posterUrl: {type: String, required: false}, //POSTER SET TO FALSE FOR TESTING
+    posterUrl: {type: String, required: true},
     desc: {type: String, required: true},
     rating: {type: String, required: true, max: 30},
-    duration: {type: String, required: true, min: 1},
+    duration: {type: Number, required: true, min: 1},
     price: {type: Number, required: true},
-
     time1: {type: String, required: false},
     time2: {type: String, required: false},
     time3: {type: String, required: false}
@@ -28,10 +20,16 @@ const ScreeningSchema = new mongoose.Schema(
   }
 );
 
-ScreeningSchema.virtual('datetxt')
+screeningSchema.virtual('datetxt')
 .get(function() {
   return this.date.toDateString();
 })
 
+// look for an existing screening in the db
+exports.getOne = (query, next) => {
+    screeningModel.findOne(query, (err, screening) => {
+        next(err, screening);
+    });
+};
 
-module.exports = mongoose.model('Screenings', ScreeningSchema);
+module.exports = mongoose.model('Screenings', screeningSchema);
