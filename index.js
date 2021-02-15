@@ -406,56 +406,37 @@ app.post('/user-register', userRegisterValidation, (req, res) => {
   }
 });
 
-app.post('/addUser', function(req, res) {
-  var user = new userModel({
-    first_name: req.body.first_name,
-    family_name: req.body.family_name,
-    email: req.body.email,
-    password: req.body.password,
-    usertype: req.body.usertype
-  });
-  user.save(function(err, user) {
-    var result;
-    if (err) {
-      console.log(err.errors);
-      result = {success: false, message: "User was not created. Please try again."};
-      res.send(result);
-    } else {
-      console.log("User creation success!");
-      result = {success: true, message: "User was successfully created!"};
-      res.send(result);
-    }
-  });
-});
-
-app.post('/searchUser', function(req, res) {
-  userModel.findOne({email: req.body.email, password: req.body.password}, function(err, user){
-    var result = {cont: user, ok: true};
-    if (err)
-      console.log('There is an error when searching for a user.');
-    console.log("User: " + user);
-    if (user == null)
-        result.ok = false;
-    else
-        result.ok = true;
-    console.log("Result: " + result.ok);
-    res.send(result);
-  });
-});
-
-app.post('/searchUserExist', function(req, res) {
-  userModel.findOne({email: req.body.email}, function(err, user){
-    var result;
-    if (err)
-      console.log('There is an error when searching for a user.');
-    console.log("User: " + user);
-    if (user == null)
-        result = false;
-    else
-        result = true;
-    console.log("Exist: " + result);
-    res.send(result);
-  });
+app.post('/user-login', userLoginValidation, (req, res) => {
+  const errors = validationResult(req);
+  if(errors.isEmpty()) {
+    const {emaillog, passlog} = req.body;
+    userModel.getOne({email: emaillog}, (err, user) => {
+      if(err) {
+        console.log(err); //testing
+        res.redirect('/login');
+      } else {
+        if(user) {
+          bcrypt.compare(passlog, user.password, (err, result) => {
+            if (result) {
+              req.session.user = user._id;
+              req.session.username = user.username;
+              res.redirect('/movies');
+            } else {
+              req.flash('error_msg', 'Incorrect password. Please try again.');
+              res.redirect('/');
+            }
+          });
+        } else {
+          req.flash('error_msg', 'User not found. Please try again.');
+          res.redirect('/');
+        }
+      }
+    });
+  } else {
+    const messages = errors.array().map((item) => item.msg);
+    req.flash('error_msg', messages.join(' '));
+    res.redirect('/');
+  }
 });
 
 /* Scrennings Page */
