@@ -25,11 +25,23 @@ screeningSchema.virtual('datetxt')
   return this.date.toDateString();
 })
 
+const screeningModel = mongoose.model('screenings', screeningSchema);
+
+// Get all screenings that fit the query
+exports.getAll = (query, next) => {
+  screeningModel.find(query).exec((err, screens) => {
+    if (err) throw err;
+    const screenObjects = [];
+    screens.forEach((doc) => {
+      screenObjects.push(doc.toObject());
+    });
+    next(err, screenObjects);
+  });
+};
+
 // look for an existing screening in the db
 exports.getOne = (query, next) => {
     screeningModel.findOne(query, (err, screening) => {
         next(err, screening);
     });
 };
-
-module.exports = mongoose.model('Screenings', screeningSchema);

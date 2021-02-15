@@ -419,7 +419,7 @@ app.post('/user-login', userLoginValidation, (req, res) => {
           bcrypt.compare(passlog, user.password, (err, result) => {
             if (result) {
               req.session.user = user._id;
-              req.session.username = user.username;
+              req.session.fullname = user.full_name;
               res.redirect('/movies');
             } else {
               req.flash('error_msg', 'Incorrect password. Please try again.');
@@ -439,7 +439,7 @@ app.post('/user-login', userLoginValidation, (req, res) => {
   }
 });
 
-/* Scrennings Page */
+/* Screenings Page */
 app.get('/movies', function(req, res) {
     var today = new Date(2020, 4, 9); //hardcoded dates
     var tom = new Date(2020, 4, 10);
@@ -448,29 +448,20 @@ app.get('/movies', function(req, res) {
     var screens2 = [];
     var screens3 = [];
 
-    mongoClient.connect(databaseURL, options, function(err, client) {
-      if(err) throw err;
-      const dbo = client.db(dbname);
-
-      screeningModel.find({date: today}).sort({date: 1}).exec(function(err, result){
+      screeningModel.getAll({date: today}, (err, result) => {
           result.forEach(function(doc) {
-          screens1.push(doc.toObject());
+          screens1.push(doc);
         });
-        screeningModel.find({date: tom}).sort({date: 1}).exec(function(err, result){
+        screeningModel.getAll({date: tom}, (err, result) => {
             result.forEach(function(doc) {
-            screens2.push(doc.toObject());
+            screens2.push(doc);
           });
-          screeningModel.find({date: next}).sort({date: 1}).exec(function(err, result){
+          screeningModel.getAll({date: next}, (err, result) => {
               result.forEach(function(doc) {
-              screens3.push(doc.toObject());
+              screens3.push(doc);
           });
-          dbo.collection("users").findOne({"_id": ObjectId("3eaeb86894873f1464ff4d00"/*hardcoded employee user*/)}, function(err, resultUser) {
-            if(err) throw err;
-            var user = resultUser;
-
-            client.close();
             res.render('movies', {
-              user: user,
+              user: req.session.fullname,
               pageCSS: "BigBrain_Screenings",
               pageJS: "BigBrain_Screenings",
               pageTitle: "Movie Screenings",
@@ -483,9 +474,7 @@ app.get('/movies', function(req, res) {
               date2: tom.toDateString(),
               date3: next.toDateString()
             });
-          });
         });
-      });
       });
     });
 });
@@ -504,6 +493,18 @@ app.post('/searchScreening', function(req, res) {
     console.log("Result: " + result.empty);
     res.send(result);
   });
+});
+
+/*Header*/
+//for user logout
+app.get('/logout', (req, res) => {
+  if(req.session){
+    console.log(req.session);
+    req.session.destroy(() => {
+      res.clearCookie('connect.sid');
+      res.redirect('/');
+    });
+  };
 });
 
 
