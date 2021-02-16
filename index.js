@@ -449,15 +449,16 @@ app.get('/movies', function(req, res) {
     var screens3 = [];
     var username;
 
-      screeningModel.getAll({date: today}, (err, result) => {
+      screeningModel.forMovies({date: today}, (err, result) => {
           result.forEach(function(doc) {
           screens1.push(doc);
         });
-        screeningModel.getAll({date: tom}, (err, result) => {
+        console.log(screens1[0].slots);
+        screeningModel.forMovies({date: tom}, (err, result) => {
             result.forEach(function(doc) {
             screens2.push(doc);
           });
-          screeningModel.getAll({date: next}, (err, result) => {
+          screeningModel.forMovies({date: next}, (err, result) => {
               result.forEach(function(doc) {
               screens3.push(doc);
           });

@@ -14,9 +14,9 @@
             Runtime: {{this.duration}} Minutes<br>
             Rating: {{this.rating}}<br>
             {{this.price}} PHP<br><br>
-            <a class="slotlink" style="color: blue">{{this.time1}}</a><br>
-            <a class="slotlink" style="color: blue">{{this.time2}}</a><br>
-            <a class="slotlink" style="color: blue">{{this.time3}}</a><br>
+						{{#each this.slots}}
+            	<a class="slotlink" style='color: blue'>{{this.slotStart}} - {{this.slotEnd}}</a><br>
+						{{/each}}
             <div class='text-justify text-muted'>
               {{this.desc}}
             </div>
@@ -42,9 +42,9 @@
             Runtime: {{this.duration}} Minutes<br>
             Rating: {{this.rating}}<br>
             {{this.price}} PHP<br><br>
-            <a class="slotlink" style='color: blue'>{{this.time1}}</a><br>
-            <a class="slotlink" style="color: blue">{{this.time2}}</a><br>
-            <a class="slotlink" style="color: blue">{{this.time3}}</a><br>
+						{{#each this.slots}}
+            	<a class="slotlink" style='color: blue'>{{this.slotStart}} - {{this.slotEnd}}</a><br>
+						{{/each}}
             <div class='text-justify text-muted'>
               {{this.desc}}
             </div>
@@ -70,9 +70,9 @@
             Runtime: {{this.duration}} Minutes<br>
             Rating: {{this.rating}}<br>
             {{this.price}} PHP<br><br>
-            <a class="slotlink" style="color: blue">{{this.time1}}</a><br>
-            <a class="slotlink" style="color: blue">{{this.time2}}</a><br>
-            <a class="slotlink" style="color: blue">{{this.time3}}</a><br>
+						{{#each this.slots}}
+            	<a class="slotlink" style='color: blue'>{{this.slotStart}} - {{this.slotEnd}}</a><br>
+						{{/each}}
             <div class='text-justify text-muted'>
               {{this.desc}}
             </div>

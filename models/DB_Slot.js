@@ -1,13 +1,6 @@
-const mongoose = require('mongoose');
-const databaseURL = 'mongodb+srv://OafallasKenneth:a1b2c3d4@ccapdev-mp-bigbrainmovies-mubsx.gcp.mongodb.net/BigBrainDB?retryWrites=true&w=majority';
+const mongoose = require('./connection');
 
-const options = { useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useFindAndModify: false };
-
-mongoose.connect(databaseURL, options);
-
-const SlotSchema = new mongoose.Schema(
+const slotSchema = new mongoose.Schema(
     {
         screening: {type: mongoose.Schema.Types.ObjectId, ref: "Screenings", required: true},
         slotOrder: {type: Number, required: true, min: 1, max: 3},
@@ -20,4 +13,16 @@ const SlotSchema = new mongoose.Schema(
     }
 );
 
-module.exports = mongoose.model('Slot', SlotSchema);
+const slotModel = mongoose.model('slots', slotSchema);
+
+// Get all slots that fit the query
+exports.getAll = (query, next) => {
+  slotModel.find(query).exec((err, slots) => {
+    if (err) throw err;
+    const slotObjects = [];
+    slots.forEach((doc) => {
+      slotObjects.push(doc.toObject());
+    });
+    next(err, slotObjects);
+  });
+};
