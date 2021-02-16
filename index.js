@@ -225,36 +225,18 @@ app.post("/addScreening", function(req, res) {
 });
 
 /*Seat Selection posts*/
-app.post('/getSeatStatus', function(req, res) {
-  var query = {
-    slot:ObjectId(req.body.slot)
-  };
-
-    mongoClient.connect(databaseURL, options, function(err, client) {
-      if(err) throw err;
-
-      const dbo = client.db(dbname);
-
-      dbo.collection("seats").find(query).toArray(function(err, result) {
-        if(err) throw err;
-
-        client.close();
-
-        res.send(result);
-      });
-    });
+app.post('/getSeatStatus', function(req, res) {  
+  seatModel.find().where("slot", ObjectId(req.body.slot))
+  .exec(function(err, result) {
+    if(err) throw err;
+    res.send(result);
+  });
 });
 
 app.post("/reserveSeats", function(req, res) {
-  mongoClient.connect(databaseURL, options, function(err, client) {
-    if(err) throw err;
-    const dbo = client.db(dbname);
-
-    dbo.collection("seats").updateMany({slot: ObjectId(req.body.slot), seatNum: {$in: req.body.reservedSeats}}, {$set: {status: "R", owner: ObjectId("3eaeb86894873f1464ff4d00"/*hardcoded client user*/)}}, function(err, result) {
-      if (err) throw err;
-
-      client.close();
-    });
+  seatModel.updateMany({slot: ObjectId(req.body.slot), seatNum: {$in: req.body.reservedSeats}}, {$set: {status: "R", owner: ObjectId("3eaeb86894873f1464ff4d00"/*hardcoded client user*/)}}, function(err, result) {
+    if (err) throw err;
+    res.redirect('/checkout');
   });
 });
 

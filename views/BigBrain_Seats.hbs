@@ -47,7 +47,7 @@
             <h2>Select Seats</h2>
             <h2 id="screen">SCREEN</h2>
 
-            <form name="seatSelectionForm" action="checkout" onsubmit="return checkSeatForm()">
+            {{!-- <form name="seatSelectionForm" action="checkout" onsubmit="return checkSeatForm()"> --}}
             <ol>
             <!--Row A-->
             <li>
@@ -512,6 +512,6 @@
 
               <div id="noSeatAlert" role="alert">
               </div>
-              <button type="submit" class="btn btn-primary" id="seatSubmit">Checkout</button>
-            </form>
+              <button class="btn btn-primary" id="seatSubmit">Checkout</button>
+            {{!-- </form> --}}
         </div>
