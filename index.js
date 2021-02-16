@@ -151,7 +151,7 @@ app.use((req, res, next) => {
   next();
 });
 
-/************Ken Posts */
+/* Employee Services posts */
 app.post("/addScreening", function(req, res) {
   const screening = new screeningModel({
     date: req.body.date,
@@ -254,6 +254,7 @@ app.post("/addScreening", function(req, res) {
   });
 });
 
+/*Seat Selection posts*/
 app.post('/getSeatStatus', function(req, res) {
   var query = {
     slot:ObjectId(req.body.slot)

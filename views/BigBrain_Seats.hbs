@@ -1,41 +1,44 @@
-<div class="container">
-  <h1 id="screenNum">Screen {{screening.screenNum}}</h1>
+<div class="grid">
+  <div id="screen-num">
+    Screen {{screening.screenNum}}
+  </div>
 </div>
   
 <!--Movie Info-->
-<div class="container d-flex" id="movieInfo">
+<div class="grid" id="movie-info">
   <!--Poster-->
-  <div class="flex-row" id="posterRow">
+  <div id="poster-col">
     <img id="poster" src={{screening.posterUrl}}>
   </div>  
 
-  <div class="flex-row" id="infoRow">
-    <!--Title-->
-    <div class="flex-column" id="title">
-      <p>{{screening.title}}</p>
-    </div>
+  <div id="info-col">
+      <!--Title-->
+      <div id="title">
+        <p>{{screening.title}}</p>
+      </div>
 
-    <!--Description-->
-    <div class="text-justify flex-column" id="description">
-      <p>{{screening.desc}}</p>
-    </div>
-              
-    <!--Date and Time Slot-->
-    <div class="flex-column" id="slot">
-      {{dateFormatted}} <br>
-      {{slot.slotStart}}
-    </div>
+      <!--Description-->
+      <div class="text-justify" id="description">
+        <p>{{screening.desc}}</p>
+      </div>
+                
+      <!--Date and Time Slot-->
+      <div id="slot">
+        {{dateFormatted}} <br>
+        {{slot.slotStart}} - {{slot.slotEnd}}
+      </div>
 
-    <!--Duration-->
-    <div class="flex-column" id="duration">
-      {{screening.duration}} Minutes
-    </div>
+      <!--Duration-->
+      <div id="duration">
+        Runtime: {{screening.duration}} Minutes
+      </div>
 
-    <!--Price-->
-    <div class="flex-column" id="price">
-      PHP {{screening.price}}
-    </div>
+      <!--Price-->
+      <div id="price">
+        Price: PHP {{screening.price}}
+      </div>
   </div>
+  
 </div>
 <!--########-->
 
