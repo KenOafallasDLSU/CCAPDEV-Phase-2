@@ -1,11 +1,4 @@
-const mongoose = require('mongoose');
-const databaseURL = 'mongodb+srv://OafallasKenneth:a1b2c3d4@ccapdev-mp-bigbrainmovies-mubsx.gcp.mongodb.net/BigBrainDB?retryWrites=true&w=majority';
-
-const options = { useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useFindAndModify: false };
-
-mongoose.connect(databaseURL, options);
+const mongoose = require('./connection');
 
 const SlotSchema = new mongoose.Schema(
     {
@@ -20,4 +13,5 @@ const SlotSchema = new mongoose.Schema(
     }
 );
 
-module.exports = mongoose.model('Slot', SlotSchema);
+module.exports = mongoose.model('slots', SlotSchema);
+

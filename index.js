@@ -3,7 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const exphbs = require('express-handlebars');
-const handlebars = require('handlebars');
+const _handlebars = require('handlebars');
 const bodyParser = require('body-parser');
 const mongodb = require('mongodb');
 const mongoose = require('./models/connection');
@@ -13,6 +13,7 @@ const ObjectId = require('mongodb').ObjectId;
 const MongoStore = require('connect-mongo')(session);
 const {envPort, sessionKey} = require('./config');
 const methodOverride = require('method-override');
+const {allowInsecurePrototypeAccess} = require('@handlebars/allow-prototype-access')
 
 
 //creates express app
@@ -29,45 +30,13 @@ const userModel = require('./models/DB_User');
 const screeningModel = require('./models/DB_Screening');
 const slotModel = require('./models/DB_Slot');
 const seatModel = require('./models/DB_Seat');
-const transactionModel = require('./models/DB_Transaction');
+//const transactionModel = require('./models/DB_Transaction');
 
 //others
 const bcrypt = require('bcrypt');
 const {validationResult} = require('express-validator');
 const {userRegisterValidation, userLoginValidation} = require('./validators.js');
 const options = { useUnifiedTopology: true };
-
-/*
-// additional connection options
-const options = { useUnifiedTopology: true };
-
-//create mongodb collections if they do not exist
-mongoClient.connect(databaseURL, options, function(err, client) {
-    if (err) throw err;
-    const dbo = client.db(dbname);
-
-    dbo.createCollection("users", function(err, res) {
-      if (err) throw err;
-
-      dbo.createCollection("screenings", function(err, res) {
-        if (err) throw err;
-
-        dbo.createCollection("slots", function(err, res) {
-          if (err) throw err;
-
-          dbo.createCollection("seats", function(err, res) {
-            if (err) throw err;
-
-            dbo.createCollection("transactions", function(err, res) {
-              if (err) throw err;
-              client.close();
-            });
-          });
-        });
-      });
-    });
-});
-*/
 
 /*************Multer File Uploads */
 /*
@@ -123,7 +92,8 @@ app.engine('hbs', exphbs({
     extname: 'hbs',
     defaultView: 'main',
     layoutsDir: path.join(__dirname, '/views/layouts'),
-    partialsDir: path.join(__dirname, '/views/partials')
+    partialsDir: path.join(__dirname, '/views/partials'),
+    handlebars: allowInsecurePrototypeAccess(_handlebars)
 }));
 
 app.set('view engine', 'hbs');
@@ -294,27 +264,21 @@ app.post("/reserveSeats", function(req, res) {
 app.get("/seatSelection", function(req, res) {
   var currSlotId = "5ec0c846ca85a61340446897"
 
-    mongoClient.connect(databaseURL, options, function(err, client) {
-      if(err) throw err;
-      const dbo = client.db(dbname);
-
-      dbo.collection("slots").findOne({"_id": ObjectId(currSlotId)}, function(err, result1) {
+      slotModel.findOne({"_id": ObjectId(currSlotId)}, function(err, result1) {
         if(err) throw err;
         var slot = result1;
 
-        dbo.collection("screenings").findOne({"_id": slot.screening}, function(err, result2) {
+        screeningModel.getOne({"_id": slot.screening}, function(err, result2) {
           if(err) throw err;
           var screening = result2;
 
-          dbo.collection("users").findOne({"_id": ObjectId("3eaeb86894873f1464ff4d00"/*hardcoded client user*/)}, function(err, resultUser) {
+          userModel.getOne({"_id": ObjectId("3eaeb86894873f1464ff4d00"/*hardcoded client user*/)}, function(err, resultUser) {
             if(err) throw err;
             var user = resultUser;
 
-            client.close();
-
             res.render("BigBrain_Seats", {
               //header
-              user: user,
+              user: user.full_name,
 
               //main head
               pageCSS: "BigBrain_Seats",
@@ -331,7 +295,6 @@ app.get("/seatSelection", function(req, res) {
           });
         });
       });
-    });
 });
 
 app.get("/employeeFacing", function(req, res) {
