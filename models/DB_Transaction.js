@@ -1,11 +1,4 @@
-const mongoose = require('mongoose');
-const databaseURL = 'mongodb+srv://OafallasKenneth:a1b2c3d4@ccapdev-mp-bigbrainmovies-mubsx.gcp.mongodb.net/BigBrainDB?retryWrites=true&w=majority';
-
-const options = { useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useFindAndModify: false };
-
-mongoose.connect(databaseURL, options);
+const mongoose = require('./connection');
 
 const TransactionSchema = new mongoose.Schema(
     {
@@ -38,12 +31,4 @@ TransactionSchema.virtual("seatCount")
         return this.seats.length;
     });
 
-/*
-TransactionSchema.virtual("totalPrice")
-    .get(function() {
-        //might not werk
-        return this.seats.length * this.screening.price;
-    });
-*/
-
-module.exports = mongoose.model('Transaction', TransactionSchema);
+module.exports = mongoose.model('transactions', TransactionSchema);

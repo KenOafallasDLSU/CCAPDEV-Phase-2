@@ -33,26 +33,29 @@ $(document).ready(function() {
     });
 
     $("#seatSubmit").click(function(){
-        var reservedSeats = [];
+        //console.log("in seat submit")
+        let reservedSeats = [];
 
-        var i = 0, j = 0;
-        var letter = 'A';
-        var number = 1;
+        let i = 0, j = 0;
+        let letter = 'A';
+        let number = 1;
 
         for(i = 0; i < 10; i++)
         {
             for(j = 0; j < 10; j++)
             {
-                if($("#".concat(String.fromCharCode(letter.charCodeAt() + i).concat(number + j))).checked)
+                let id = "#".concat(String.fromCharCode(letter.charCodeAt() + i).concat(number + j))
+                //console.log($(id).is(":checked"))
+                if($(id).is(":checked"))
                     reservedSeats.push(String.fromCharCode(letter.charCodeAt() + i).concat(number + j));
             }
         }
 
         if(checkSeatForm() == true)
         {
+            //console.log(reservedSeats)
             $.post("reserveSeats", {slot: "5ec0c846ca85a61340446897", reservedSeats: reservedSeats}, function(data, status) {
-                if(data.success) {
-                }
+
             });
         }
     });

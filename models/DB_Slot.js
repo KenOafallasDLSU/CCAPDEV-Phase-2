@@ -1,6 +1,6 @@
 const mongoose = require('./connection');
 
-const slotSchema = new mongoose.Schema(
+const SlotSchema = new mongoose.Schema(
     {
         screening: {type: mongoose.Schema.Types.ObjectId, ref: "Screenings", required: true},
         slotOrder: {type: Number, required: true, min: 1, max: 3},
@@ -13,7 +13,7 @@ const slotSchema = new mongoose.Schema(
     }
 );
 
-const slotModel = mongoose.model('slots', slotSchema);
+const slotModel = mongoose.model('slots', SlotSchema);
 
 // Get all slots that fit the query
 exports.getAll = (query, next) => {
@@ -25,4 +25,9 @@ exports.getAll = (query, next) => {
     });
     next(err, slotObjects);
   });
+};
+
+// get one slot matching query parameter
+exports.getOne = (query) => {
+  return slotModel.findOne(query).exec()
 };
