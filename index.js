@@ -224,7 +224,10 @@ app.post("/addScreening", function(req, res) {
   });
 });
 
-/*Seat Selection posts*/
+/**
+ * POST route
+ * get statis of seats, whether A,R,U
+ */
 app.post('/getSeatStatus', function(req, res) {  
   seatModel.find().where("slot", ObjectId(req.body.slot))
   .exec(function(err, result) {
@@ -233,6 +236,10 @@ app.post('/getSeatStatus', function(req, res) {
   });
 });
 
+/**
+ * POST route
+ * updates seats selected to Reserved then redirects to checkout
+ */
 app.post("/reserveSeats", function(req, res) {
   seatModel.updateMany({slot: ObjectId(req.body.slot), seatNum: {$in: req.body.reservedSeats}}, {$set: {status: "R", owner: ObjectId("3eaeb86894873f1464ff4d00"/*hardcoded client user*/)}}, function(err, result) {
     if (err) throw err;
@@ -240,43 +247,39 @@ app.post("/reserveSeats", function(req, res) {
   });
 });
 
-/************************ */
+/**
+ * Render seatSelection page
+ */
+app.get("/seatSelection", async (req, res) => {
+  let currSlotId = "5ec0c846ca85a61340446897"
+  let slot = await slotModel.getOne({"_id": ObjectId(currSlotId)})
 
-/************Ken Displays */
-app.get("/seatSelection", function(req, res) {
-  var currSlotId = "5ec0c846ca85a61340446897"
+  screeningModel.getOne({"_id": slot.screening}, function(err, result2) {
+    if(err) throw err;
+    var screening = result2;
 
-      slotModel.findOne({"_id": ObjectId(currSlotId)}, function(err, result1) {
-        if(err) throw err;
-        var slot = result1;
+    userModel.getOne({"_id": ObjectId("3eaeb86894873f1464ff4d00"/*hardcoded client user*/)}, function(err, resultUser) {
+      if(err) throw err;
+      var user = resultUser;
 
-        screeningModel.getOne({"_id": slot.screening}, function(err, result2) {
-          if(err) throw err;
-          var screening = result2;
+      res.render("BigBrain_Seats", {
+        //header
+        user: user.full_name,
 
-          userModel.getOne({"_id": ObjectId("3eaeb86894873f1464ff4d00"/*hardcoded client user*/)}, function(err, resultUser) {
-            if(err) throw err;
-            var user = resultUser;
+        //main head
+        pageCSS: "BigBrain_Seats",
+        pageJS: "BigBrain_Seats",
+        pageTitle: "Seat Selection",
+        header: "header",
+        footer: "footer",
 
-            res.render("BigBrain_Seats", {
-              //header
-              user: user.full_name,
-
-              //main head
-              pageCSS: "BigBrain_Seats",
-              pageJS: "BigBrain_Seats",
-              pageTitle: "Seat Selection",
-              header: "header",
-              footer: "footer",
-
-              //body
-              screening: screening,
-              slot: slot,
-              dateFormatted: screening.date.toDateString()
-            });
-          });
-        });
+        //body
+        screening: screening,
+        slot: slot,
+        dateFormatted: screening.date.toDateString()
       });
+    });
+  });
 });
 
 app.get("/employeeFacing", function(req, res) {
@@ -395,15 +398,16 @@ app.get('/movies', function(req, res) {
     var screens3 = [];
     var username;
 
-      screeningModel.getAll({date: today}, (err, result) => {
+      screeningModel.forMovies({date: today}, (err, result) => {
           result.forEach(function(doc) {
           screens1.push(doc);
         });
-        screeningModel.getAll({date: tom}, (err, result) => {
+        console.log(screens1[0].slots);
+        screeningModel.forMovies({date: tom}, (err, result) => {
             result.forEach(function(doc) {
             screens2.push(doc);
           });
-          screeningModel.getAll({date: next}, (err, result) => {
+          screeningModel.forMovies({date: next}, (err, result) => {
               result.forEach(function(doc) {
               screens3.push(doc);
           });

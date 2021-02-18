@@ -13,5 +13,21 @@ const SlotSchema = new mongoose.Schema(
     }
 );
 
-module.exports = mongoose.model('slots', SlotSchema);
+const slotModel = mongoose.model('slots', SlotSchema);
 
+// Get all slots that fit the query
+exports.getAll = (query, next) => {
+  slotModel.find(query).exec((err, slots) => {
+    if (err) throw err;
+    const slotObjects = [];
+    slots.forEach((doc) => {
+      slotObjects.push(doc.toObject());
+    });
+    next(err, slotObjects);
+  });
+};
+
+// get one slot matching query parameter
+exports.getOne = (query) => {
+  return slotModel.findOne(query).exec()
+};
