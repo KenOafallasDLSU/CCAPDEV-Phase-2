@@ -1,0 +1,31 @@
+<div class='container'>
+	<h2><strong>Transaction History</strong></h2>
+    <div class = 'wrapper'>
+        <div>
+            Movie
+        </div>
+        <div>
+            Date
+        </div>
+        <div>
+            Seats
+        </div>
+        <div>
+            Status
+        </div>
+        {{#each transactions}}
+        <div>
+            {{title}}
+        </div>
+        <div>
+            {{date}}
+        </div>
+        <div>
+            {{seats}}
+        </div>
+        <div>
+            {{status}}
+        </div>
+        {{/each}}
+    </div>
+</div>

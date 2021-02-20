@@ -47,3 +47,18 @@ TransactionSchema.virtual("totalPrice")
 */
 
 module.exports = mongoose.model('Transaction', TransactionSchema);
+const transactionModel = mongoose.model('Transaction', TransactionSchema);
+
+exports.getUserTransactions = (user, next) => {
+    transactionModel.find({client: user}).exec((err, orders) => {
+        if (err) throw err;
+        const transactions = [];
+        orders.forEach((doc) => {
+            transactions.push(doc.toObject());
+        });
+        next(err,transactions);
+    })
+}
+
+
+  

@@ -439,6 +439,58 @@ app.post('/user-login', userLoginValidation, (req, res) => {
   }
 });
 
+/* transaction history page */
+
+app.get('/transaction-history',function(req,res) {
+    var user
+    var today = new Date(2020, 4, 9);
+    if (req.session.fullname != null)
+      user = req.session.user
+    else
+      user = false
+    if (user){
+      userModel.getOne({_id:user}, (err,client) => {
+        if (err) {
+          console.log("error")
+          throw err
+        }
+        else{
+          var transArray =[]
+          var transObj;
+          transactionModel.getUserTransactions(client, (err, transactions) => {
+            if (err) throw err
+            if (transactions) {
+              transactions.foreach(element =>{
+                screeningModel.getOne(element.screening,(err,movie) => {
+                  if (err) throw err
+                  if (movie) {
+                    transObj['title'] = movie.title
+                    transObj['date'] = element.date
+                    transObj['seats'] = element.seats
+                    if (element.date < today)
+                      transObj['status'] = 'Completed' /* placeholder */
+                    else
+                      transObj['status'] = 'Reserved'
+                    transArray.push(transObj)
+
+                    res.render('BigBrain_TransactionHistory', {
+                      user:user,
+                      pageCSS: "BigBrain_TransactionHistory",
+                      pageTitle: "Transaction History",
+                      header: "header",
+                      footer: "footer",
+                      transactions: transArray
+                    })
+                  }
+                })
+              })
+            }
+          })
+        }
+      })
+    }
+})
+
 /* Screenings Page */
 app.get('/movies', function(req, res) {
     var today = new Date(2020, 4, 9); //hardcoded dates
@@ -487,6 +539,7 @@ app.get('/movies', function(req, res) {
       });
     });
 });
+
 
 //screening posts
 app.post('/searchScreening', function(req, res) {
