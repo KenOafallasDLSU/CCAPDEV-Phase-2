@@ -13,7 +13,7 @@ const SeatSchema = new mongoose.Schema(
     }
 );
 
-//module.exports = mongoose.model('Seat', SeatSchema);
+module.exports = mongoose.model('Seat', SeatSchema);
 const seatsModel = mongoose.model('Seats',SeatSchema)
 
 exports.getUserSeats = (user,next) => {
