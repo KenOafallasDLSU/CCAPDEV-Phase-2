@@ -250,34 +250,29 @@ app.post("/reserveSeats", function(req, res) {
 /**
  * Render seatSelection page
  */
-app.get("/seatSelection", async (req, res) => {
-  let currSlotId = "5ec0c846ca85a61340446897"
+app.get("/seatSelection/:slotid", async (req, res) => {
+  let currSlotId = req.params.slotid
   let slot = await slotModel.getOne({"_id": ObjectId(currSlotId)})
 
-  screeningModel.getOne({"_id": slot.screening}, function(err, result2) {
+  screeningModel.getOne({"_id": slot.screening}, function(err, result) {
     if(err) throw err;
-    var screening = result2;
+    var screening = result;
 
-    userModel.getOne({"_id": ObjectId("3eaeb86894873f1464ff4d00"/*hardcoded client user*/)}, function(err, resultUser) {
-      if(err) throw err;
-      var user = resultUser;
+    res.render("BigBrain_Seats", {
+      //header
+      user: req.session.fullname,
 
-      res.render("BigBrain_Seats", {
-        //header
-        user: user.full_name,
+      //main head
+      pageCSS: "BigBrain_Seats",
+      pageJS: "BigBrain_Seats",
+      pageTitle: "Seat Selection",
+      header: "header",
+      footer: "footer",
 
-        //main head
-        pageCSS: "BigBrain_Seats",
-        pageJS: "BigBrain_Seats",
-        pageTitle: "Seat Selection",
-        header: "header",
-        footer: "footer",
-
-        //body
-        screening: screening,
-        slot: slot,
-        dateFormatted: screening.date.toDateString()
-      });
+      //body
+      screening: screening,
+      slot: slot,
+      dateFormatted: screening.date.toDateString()
     });
   });
 });
