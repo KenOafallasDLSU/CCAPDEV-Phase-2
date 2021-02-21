@@ -46,7 +46,6 @@ TransactionSchema.virtual("totalPrice")
     });
 */
 
-module.exports = mongoose.model('Transaction', TransactionSchema);
 const transactionModel = mongoose.model('Transaction', TransactionSchema);
 
 exports.getUserTransactions = (user, next) => {
@@ -60,5 +59,10 @@ exports.getUserTransactions = (user, next) => {
     })
 }
 
-
-  
+exports.create = (object,next) => {
+    const newTransaction = new transactionModel(object)
+    newTransaction.save((err,transaction) => {
+        next(err,transaction)
+    })
+}
+//module.exports = mongoose.model('Transaction', TransactionSchema);

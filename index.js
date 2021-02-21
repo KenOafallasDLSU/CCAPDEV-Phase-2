@@ -441,7 +441,7 @@ app.post('/user-login', userLoginValidation, (req, res) => {
 
 /* transaction history page */
 
-app.get('/transaction-history',function(req,res) {
+app.get('/transactions',function(req,res) {
     var user
     var today = new Date(2020, 4, 9);
     if (req.session.fullname != null)
@@ -449,7 +449,8 @@ app.get('/transaction-history',function(req,res) {
     else
       user = false
     if (user){
-      userModel.getOne({_id:user}, (err,client) => {
+      dbo.collection("users").findOne({"_id": ObjectId("5ec0cd81474d4f15d0f4fd0a"/*hardcoded employee user*/)}, function(err, client) {
+      //userModel.getOne({_id:user}, (err,client) => {
         if (err) {
           console.log("error")
           throw err
@@ -460,9 +461,10 @@ app.get('/transaction-history',function(req,res) {
           transactionModel.getUserTransactions(client, (err, transactions) => {
             if (err) throw err
             if (transactions) {
-              transactions.foreach(element =>{
+              transactions.forEach(element =>{
                 screeningModel.getOne(element.screening,(err,movie) => {
                   if (err) throw err
+                  console.log(screening)
                   if (movie) {
                     transObj['title'] = movie.title
                     transObj['date'] = element.date
@@ -472,17 +474,16 @@ app.get('/transaction-history',function(req,res) {
                     else
                       transObj['status'] = 'Reserved'
                     transArray.push(transObj)
-
-                    res.render('BigBrain_TransactionHistory', {
-                      user:user,
-                      pageCSS: "BigBrain_TransactionHistory",
-                      pageTitle: "Transaction History",
-                      header: "header",
-                      footer: "footer",
-                      transactions: transArray
-                    })
                   }
                 })
+              })
+              res.render('BigBrain_TransactionHistory', {
+                user:user,
+                pageCSS: "BigBrain_TransactionHistory",
+                pageTitle: "Transaction History",
+                header: "header",
+                footer: "footer",
+                transactions: transArray
               })
             }
           })
@@ -557,6 +558,43 @@ app.post('/searchScreening', function(req, res) {
   });
 });
 
+/* checkout page */
+app.get('/checkout', function (req,res) {
+  var user
+  var today = new Date(2020, 4, 9);
+  if (req.session.fullname != null)
+    user = req.session.user
+  else
+    user = 'false'
+  if (user) {
+    userModel.getOne({_id:user},(err,client) => {
+      if (err) throw err
+      console.log(client)
+      if (client) {
+        seatModel.getUserSeats(client,(err,seats) => {
+          if (err) throw err
+          console.log(seats)
+          if (seats) {
+            res.render('BigBrain_Checkout', {
+              user: user,
+              pageCSS: "BigBrain_Checkout",
+              pageJS: "BigBrain_Checkout",
+              pageTitle: "Checkout",
+              header: "header",
+              footer: "footer",
+              seats: seats,
+            })
+          }
+        })
+      }
+    })
+  }
+})
+
+
+app.post('/checkout-confirm', function (req,res) {
+
+})
 /*Header*/
 //for user logout
 app.get('/logout', (req, res) => {
