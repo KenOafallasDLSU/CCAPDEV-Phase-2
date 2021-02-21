@@ -15,7 +15,7 @@
             Rating: {{this.rating}}<br>
             {{this.price}} PHP<br><br>
 						{{#each this.slots}}
-            	<a class="slotlink" style='color: blue'>{{this.slotStart}} - {{this.slotEnd}}</a><br>
+            	<a class="slotlink" style='color: blue' slotid={{this._id}}>{{this.slotStart}} - {{this.slotEnd}}</a><br>
 						{{/each}}
             <div class='text-justify text-muted'>
               {{this.desc}}
@@ -43,7 +43,7 @@
             Rating: {{this.rating}}<br>
             {{this.price}} PHP<br><br>
 						{{#each this.slots}}
-            	<a class="slotlink" style='color: blue'>{{this.slotStart}} - {{this.slotEnd}}</a><br>
+            	<a class="slotlink" style='color: blue' slotid={{this._id}}>{{this.slotStart}} - {{this.slotEnd}}</a><br>
 						{{/each}}
             <div class='text-justify text-muted'>
               {{this.desc}}
@@ -71,7 +71,7 @@
             Rating: {{this.rating}}<br>
             {{this.price}} PHP<br><br>
 						{{#each this.slots}}
-            	<a class="slotlink" style='color: blue'>{{this.slotStart}} - {{this.slotEnd}}</a><br>
+            	<a class="slotlink" style='color: blue' slotid={{this._id}}>{{this.slotStart}} - {{this.slotEnd}}</a><br>
 						{{/each}}
             <div class='text-justify text-muted'>
               {{this.desc}}
