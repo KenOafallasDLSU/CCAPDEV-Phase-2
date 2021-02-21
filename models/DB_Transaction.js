@@ -1,11 +1,4 @@
-const mongoose = require('mongoose');
-const databaseURL = 'mongodb+srv://OafallasKenneth:a1b2c3d4@ccapdev-mp-bigbrainmovies-mubsx.gcp.mongodb.net/BigBrainDB?retryWrites=true&w=majority';
-
-const options = { useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useFindAndModify: false };
-
-mongoose.connect(databaseURL, options);
+const mongoose = require('./connection');
 
 const TransactionSchema = new mongoose.Schema(
     {
@@ -46,7 +39,7 @@ TransactionSchema.virtual("totalPrice")
     });
 */
 
-const transactionModel = mongoose.model('Transaction', TransactionSchema);
+const transactionModel = mongoose.model('Transactions', TransactionSchema);
 
 exports.getUserTransactions = (user, next) => {
     transactionModel.find({client: user}).exec((err, orders) => {

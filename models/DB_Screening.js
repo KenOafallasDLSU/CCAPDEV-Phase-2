@@ -1,4 +1,5 @@
 const mongoose = require('./connection');
+const slotModel = require('../models/DB_Slot');
 
 const screeningSchema = new mongoose.Schema(
   {
@@ -9,10 +10,7 @@ const screeningSchema = new mongoose.Schema(
     desc: {type: String, required: true},
     rating: {type: String, required: true, max: 30},
     duration: {type: Number, required: true, min: 1},
-    price: {type: Number, required: true},
-    time1: {type: String, required: false},
-    time2: {type: String, required: false},
-    time3: {type: String, required: false}
+    price: {type: Number, required: true}
   },
   {
     toObject: { virtuals: true },
@@ -26,6 +24,32 @@ screeningSchema.virtual('datetxt')
 })
 
 const screeningModel = mongoose.model('screenings', screeningSchema);
+
+// Get all screenings for movies page
+exports.forMovies = (query, next) => {
+  screeningModel.find(query).exec((err, screens) => {
+    if (err) throw err;
+    const screenObjects = [];
+    screens.forEach((doc, i) => {
+      slotModel.getAll({screening: doc._id}, (err, slots) => {
+        var sc = {
+          date: doc.date,
+          screenNum: doc.screenNum,
+          title: doc.title,
+          posterUrl: doc.posterUrl,
+          desc: doc.desc,
+          rating: doc.rating,
+          duration: doc.duration,
+          price: doc.price,
+          slots: slots
+        }
+        screenObjects.push(sc);
+        if ((i + 1) == screens.length)
+          next(err, screenObjects);
+      });
+    });
+  });
+};
 
 // Get all screenings that fit the query
 exports.getAll = (query, next) => {

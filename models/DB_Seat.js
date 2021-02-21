@@ -1,11 +1,4 @@
-const mongoose = require('mongoose');
-const databaseURL = 'mongodb+srv://OafallasKenneth:a1b2c3d4@ccapdev-mp-bigbrainmovies-mubsx.gcp.mongodb.net/BigBrainDB?retryWrites=true&w=majority';
-
-const options = { useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useFindAndModify: false };
-
-mongoose.connect(databaseURL, options);
+const mongoose = require('./connection');
 
 const SeatSchema = new mongoose.Schema(
     {
@@ -21,7 +14,7 @@ const SeatSchema = new mongoose.Schema(
 );
 
 //module.exports = mongoose.model('Seat', SeatSchema);
-const seatsModel = mongoose.model('Seat',SeatSchema)
+const seatsModel = mongoose.model('Seats',SeatSchema)
 
 exports.getUserSeats = (user,next) => {
     var objArr = []
