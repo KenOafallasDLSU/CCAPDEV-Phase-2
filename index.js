@@ -11,7 +11,7 @@ const session = require('express-session');
 const flash = require('connect-flash');
 const ObjectId = require('mongodb').ObjectId;
 const MongoStore = require('connect-mongo')(session);
-const {envPort, sessionKey} = require('./config');
+const {envPort, dbURL, sessionKey} = require('./config');
 const methodOverride = require('method-override');
 const {allowInsecurePrototypeAccess} = require('@handlebars/allow-prototype-access')
 
@@ -22,7 +22,7 @@ const port = envPort || 3000;
 
 //Define all database connection constants
 const mongoClient = mongodb.MongoClient;
-const databaseURL = "mongodb+srv://OafallasKenneth:a1b2c3d4@ccapdev-mp-bigbrainmovies-mubsx.gcp.mongodb.net/BigBrainDB?retryWrites=true&w=majority";
+const databaseURL = dbURL
 const dbname = "BigBrainDB";
 
 //models
@@ -39,52 +39,69 @@ const {userRegisterValidation, userLoginValidation} = require('./validators.js')
 const options = { useUnifiedTopology: true };
 
 /*************Multer File Uploads */
-/*
 const crypto = require("crypto");
-const mongoose = require("mongoose");
 const multer = require("multer");
 const GridFsStorage = require("multer-gridfs-storage");
-
-const mongoURI = 'mongodb://localhost:27017/mpdb';
-
-const conn = mongoose.createConnection(mongoURI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-});
+const Grid = require('gridfs-stream');
 
 // init gfs
 let gfs;
+const conn = mongoose
 conn.once("open", () => {
-    // init stream
-    gfs = new mongoose.mongo.GridFSBucket(conn.db, {
-      bucketName: "uploads"
-    });
+  // Init stream
+  gfs = Grid(conn.db, mongoose.mongo);
+  gfs.collection('posters');
 });
 
-// Storage
+// Create storage engine
 const storage = new GridFsStorage({
-    url: mongoURI,
-    file: (req, file) => {
-      return new Promise((resolve, reject) => {
-        crypto.randomBytes(16, (err, buf) => {
-          if (err) {
-            return reject(err);
-          }
-          const filename = buf.toString("hex") + path.extname(file.originalname);
-          const fileInfo = {
-            filename: filename,
-            bucketName: "uploads"
-          };
-          resolve(fileInfo);
-        });
+  url: mongoURI,
+  file: (req, file) => {
+    return new Promise((resolve, reject) => {
+      //crypto.randomBytes(16, (err, buf) => {
+      //  if (err) {
+      //    return reject(err);
+      //  }
+      //  const filename = buf.toString('hex') + path.extname(file.originalname);
+        const fileInfo = {
+          filename: file.originalname, //filename,
+          bucketName: 'posters'
+        };
+        resolve(fileInfo);
+      //});
+    });
+  }
+});
+const upload = multer({ storage });
+
+app.post('/upload', upload.single('posterSubmit'), (req, res) => {
+  // res.json({ file: req.file });
+  // res.redirect('/');
+});
+
+// @route GET /image/:filename
+// @desc Display Image
+app.get('/image/:filename', (req, res) => {
+  gfs.files.findOne({ filename: req.params.filename }, (err, file) => {
+    // Check if file
+    if (!file || file.length === 0) {
+      return res.status(404).json({
+        err: 'No file exists'
       });
     }
-});
 
-const upload = multer({
-    storage
+    // Check if image
+    if (file.contentType === 'image/jpeg' || file.contentType === 'image/png') {
+      // Read output to browser
+      const readstream = gfs.createReadStream(file.filename);
+      readstream.pipe(res);
+    } else {
+      res.status(404).json({
+        err: 'Not an image'
+      });
+    }
+  });
 });
-*/
 /******************************** */
 
 //create engine
