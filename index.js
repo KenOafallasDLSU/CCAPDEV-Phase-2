@@ -3,7 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const exphbs = require('express-handlebars');
-const handlebars = require('handlebars');
+const _handlebars = require('handlebars');
 const bodyParser = require('body-parser');
 const mongodb = require('mongodb');
 const mongoose = require('./models/connection');
