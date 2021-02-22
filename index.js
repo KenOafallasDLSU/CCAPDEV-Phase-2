@@ -219,7 +219,7 @@ app.post("/addScreening", function(req, res) {
  * POST route
  * get statis of seats, whether A,R,U
  */
-app.post('/seatSelection/getSeatStatus', function(req, res) {  
+app.post('/seatSelection/getSeatStatus', function(req, res) {
   //console.log("Status of " + req.session.slot)
   seatModel.find().where("slot", ObjectId(req.session.slot))
   .exec(function(err, result) {
@@ -346,7 +346,11 @@ app.post('/user-login', userLoginValidation, (req, res) => {
             if (result) {
               req.session.user = user._id;
               req.session.fullname = user.full_name;
-              res.redirect('/movies');
+              req.session.type = user.usertype;
+              if (user.usertype == 'C')
+                res.redirect('/movies');
+              else
+                res.redirect('/employeeFacing')
             } else {
               req.flash('error_msg', 'Incorrect password. Please try again.');
               res.redirect('/');
