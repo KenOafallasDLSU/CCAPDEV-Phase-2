@@ -46,7 +46,7 @@ const Grid = require('gridfs-stream');
 
 // init gfs
 let gfs;
-const conn = mongoose
+const conn = mongoose.createConnection(databaseURL)
 conn.once("open", () => {
   // Init stream
   gfs = Grid(conn.db, mongoose.mongo);
@@ -55,7 +55,7 @@ conn.once("open", () => {
 
 // Create storage engine
 const storage = new GridFsStorage({
-  url: mongoURI,
+  url: databaseURL,
   file: (req, file) => {
     return new Promise((resolve, reject) => {
       //crypto.randomBytes(16, (err, buf) => {
