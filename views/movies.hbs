@@ -6,7 +6,7 @@
       {{#each day1}}
       <div class='media'>
         <a class='pull-left' href='#'>
-          <img class="media-object movie-img" src={{this.posterUrl}}>
+          <img class="media-object movie-img" src="img/{{this.posterUrl}}">
         </a>
         <div class='media-body'>
           <h4>{{this.title}}<small> Screen {{this.screenNum}}</small></h4>
@@ -15,7 +15,7 @@
             Rating: {{this.rating}}<br>
             {{this.price}} PHP<br><br>
 						{{#each this.slots}}
-            	<a class="slotlink" style='color: blue'>{{this.slotStart}} - {{this.slotEnd}}</a><br>
+            	<a class="slotlink" style='color: blue' slotid={{this._id}}>{{this.slotStart}} - {{this.slotEnd}}</a><br>
 						{{/each}}
             <div class='text-justify text-muted'>
               {{this.desc}}
@@ -34,7 +34,7 @@
       {{#each day2}}
       <div class='media'>
         <a class='pull-left' href='#'>
-          <img class="media-object movie-img" src={{this.posterUrl}}>
+          <img class="media-object movie-img" src="img/{{this.posterUrl}}">
         </a>
         <div class='media-body'>
           <h4>{{this.title}}<small> Screen {{this.screenNum}}</small></h4>
@@ -43,7 +43,7 @@
             Rating: {{this.rating}}<br>
             {{this.price}} PHP<br><br>
 						{{#each this.slots}}
-            	<a class="slotlink" style='color: blue'>{{this.slotStart}} - {{this.slotEnd}}</a><br>
+            	<a class="slotlink" style='color: blue' slotid={{this._id}}>{{this.slotStart}} - {{this.slotEnd}}</a><br>
 						{{/each}}
             <div class='text-justify text-muted'>
               {{this.desc}}
@@ -62,7 +62,7 @@
       {{#each day3}}
       <div class='media'>
         <a class='pull-left' href='#'>
-          <img class="media-object movie-img" src={{this.posterUrl}}>
+          <img class="media-object movie-img" src="img/{{this.posterUrl}}">
         </a>
         <div class='media-body'>
           <h4>{{this.title}}<small> Screen {{this.screenNum}}</small></h4>
@@ -71,7 +71,7 @@
             Rating: {{this.rating}}<br>
             {{this.price}} PHP<br><br>
 						{{#each this.slots}}
-            	<a class="slotlink" style='color: blue'>{{this.slotStart}} - {{this.slotEnd}}</a><br>
+            	<a class="slotlink" style='color: blue' slotid={{this._id}}>{{this.slotStart}} - {{this.slotEnd}}</a><br>
 						{{/each}}
             <div class='text-justify text-muted'>
               {{this.desc}}
