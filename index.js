@@ -3,7 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const exphbs = require('express-handlebars');
-const _handlebars = require('handlebars');
+const handlebars = require('handlebars');
 const bodyParser = require('body-parser');
 const mongodb = require('mongodb');
 const mongoose = require('./models/connection');
@@ -13,7 +13,6 @@ const ObjectId = require('mongodb').ObjectId;
 const MongoStore = require('connect-mongo')(session);
 const {envPort, sessionKey} = require('./config');
 const methodOverride = require('method-override');
-const {allowInsecurePrototypeAccess} = require('@handlebars/allow-prototype-access')
 
 
 //creates express app
@@ -30,13 +29,45 @@ const userModel = require('./models/DB_User');
 const screeningModel = require('./models/DB_Screening');
 const slotModel = require('./models/DB_Slot');
 const seatModel = require('./models/DB_Seat');
-//const transactionModel = require('./models/DB_Transaction');
+const transactionModel = require('./models/DB_Transaction');
 
 //others
 const bcrypt = require('bcrypt');
 const {validationResult} = require('express-validator');
 const {userRegisterValidation, userLoginValidation} = require('./validators.js');
 const options = { useUnifiedTopology: true };
+
+/*
+// additional connection options
+const options = { useUnifiedTopology: true };
+
+//create mongodb collections if they do not exist
+mongoClient.connect(databaseURL, options, function(err, client) {
+    if (err) throw err;
+    const dbo = client.db(dbname);
+
+    dbo.createCollection("users", function(err, res) {
+      if (err) throw err;
+
+      dbo.createCollection("screenings", function(err, res) {
+        if (err) throw err;
+
+        dbo.createCollection("slots", function(err, res) {
+          if (err) throw err;
+
+          dbo.createCollection("seats", function(err, res) {
+            if (err) throw err;
+
+            dbo.createCollection("transactions", function(err, res) {
+              if (err) throw err;
+              client.close();
+            });
+          });
+        });
+      });
+    });
+});
+*/
 
 /*************Multer File Uploads */
 /*
@@ -92,8 +123,7 @@ app.engine('hbs', exphbs({
     extname: 'hbs',
     defaultView: 'main',
     layoutsDir: path.join(__dirname, '/views/layouts'),
-    partialsDir: path.join(__dirname, '/views/partials'),
-    handlebars: allowInsecurePrototypeAccess(_handlebars)
+    partialsDir: path.join(__dirname, '/views/partials')
 }));
 
 app.set('view engine', 'hbs');
@@ -121,7 +151,7 @@ app.use((req, res, next) => {
   next();
 });
 
-/* Employee Services posts */
+/************Ken Posts */
 app.post("/addScreening", function(req, res) {
   const screening = new screeningModel({
     date: req.body.date,
@@ -224,62 +254,83 @@ app.post("/addScreening", function(req, res) {
   });
 });
 
-/**
- * POST route
- * get statis of seats, whether A,R,U
- */
-app.post('/getSeatStatus', function(req, res) {  
-  seatModel.find().where("slot", ObjectId(req.body.slot))
-  .exec(function(err, result) {
-    if(err) throw err;
-    res.send(result);
-  });
-});
+app.post('/getSeatStatus', function(req, res) {
+  var query = {
+    slot:ObjectId(req.body.slot)
+  };
 
-/**
- * POST route
- * updates seats selected to Reserved then redirects to checkout
- */
-app.post("/reserveSeats", function(req, res) {
-  seatModel.updateMany({slot: ObjectId(req.body.slot), seatNum: {$in: req.body.reservedSeats}}, {$set: {status: "R", owner: ObjectId("3eaeb86894873f1464ff4d00"/*hardcoded client user*/)}}, function(err, result) {
-    if (err) throw err;
-    res.redirect('/checkout');
-  });
-});
-
-/**
- * Render seatSelection page
- */
-app.get("/seatSelection", async (req, res) => {
-  let currSlotId = "5ec0c846ca85a61340446897"
-  let slot = await slotModel.getOne({"_id": ObjectId(currSlotId)})
-
-  screeningModel.getOne({"_id": slot.screening}, function(err, result2) {
-    if(err) throw err;
-    var screening = result2;
-
-    userModel.getOne({"_id": ObjectId("3eaeb86894873f1464ff4d00"/*hardcoded client user*/)}, function(err, resultUser) {
+    mongoClient.connect(databaseURL, options, function(err, client) {
       if(err) throw err;
-      var user = resultUser;
 
-      res.render("BigBrain_Seats", {
-        //header
-        user: user.full_name,
+      const dbo = client.db(dbname);
 
-        //main head
-        pageCSS: "BigBrain_Seats",
-        pageJS: "BigBrain_Seats",
-        pageTitle: "Seat Selection",
-        header: "header",
-        footer: "footer",
+      dbo.collection("seats").find(query).toArray(function(err, result) {
+        if(err) throw err;
 
-        //body
-        screening: screening,
-        slot: slot,
-        dateFormatted: screening.date.toDateString()
+        client.close();
+        console.log(result)
+        res.send(result);
       });
     });
+});
+
+app.post("/reserveSeats", function(req, res) {
+  mongoClient.connect(databaseURL, options, function(err, client) {
+    if(err) throw err;
+    const dbo = client.db(dbname);
+
+    dbo.collection("seats").updateMany({slot: ObjectId(req.body.slot), seatNum: {$in: req.body.reservedSeats}}, {$set: {status: "R", owner: ObjectId("3eaeb86894873f1464ff4d00"/*hardcoded client user*/)}}, function(err, result) {
+      if (err) throw err;
+
+      client.close();
+    });
   });
+});
+
+/************************ */
+
+/************Ken Displays */
+app.get("/seatSelection", function(req, res) {
+  var currSlotId = "5ec0c846ca85a61340446897"
+
+    mongoClient.connect(databaseURL, options, function(err, client) {
+      if(err) throw err;
+      const dbo = client.db(dbname);
+
+      dbo.collection("slots").findOne({"_id": ObjectId(currSlotId)}, function(err, result1) {
+        if(err) throw err;
+        var slot = result1;
+
+        dbo.collection("screenings").findOne({"_id": slot.screening}, function(err, result2) {
+          if(err) throw err;
+          var screening = result2;
+
+          dbo.collection("users").findOne({"_id": ObjectId("3eaeb86894873f1464ff4d00"/*hardcoded client user*/)}, function(err, resultUser) {
+            if(err) throw err;
+            var user = resultUser;
+
+            client.close();
+
+            res.render("BigBrain_Seats", {
+              //header
+              user: user,
+
+              //main head
+              pageCSS: "BigBrain_Seats",
+              pageJS: "BigBrain_Seats",
+              pageTitle: "Seat Selection",
+              header: "header",
+              footer: "footer",
+
+              //body
+              screening: screening,
+              slot: slot,
+              dateFormatted: screening.date.toDateString()
+            });
+          });
+        });
+      });
+    });
 });
 
 app.get("/employeeFacing", function(req, res) {
@@ -393,46 +444,55 @@ app.post('/user-login', userLoginValidation, (req, res) => {
 app.get('/transactions',function(req,res) {
     var user
     var today = new Date(2020, 4, 9);
+    var sort = {date: 1}
     if (req.session.fullname != null)
       user = req.session.user
     else
       user = false
     if (user){
-      dbo.collection("users").findOne({"_id": ObjectId("5ec0cd81474d4f15d0f4fd0a"/*hardcoded employee user*/)}, function(err, client) {
-      //userModel.getOne({_id:user}, (err,client) => {
+      userModel.getOne({_id:'3eaeb86894873f1464ff4d00'}, (err,client) => {
         if (err) {
           console.log("error")
           throw err
         }
-        else{
+        if (client) {
           var transArray =[]
-          var transObj;
-          transactionModel.getUserTransactions(client, (err, transactions) => {
+          var transObj = {};
+          transactionModel.getUserTransactions(client, sort,(err, transactions) => {
             if (err) throw err
             if (transactions) {
+              setTimeout(function(){
+                res.render('BigBrain_TransactionHistory', {
+                  user: client.full_name,
+                  pageCSS: "BigBrain_TransactionHistory",
+                  pageTitle: "Transaction History",
+                  header: "header",
+                  footer: "footer",
+                  transactions: transArray
+                })
+              },1000)
               transactions.forEach(element =>{
-                screeningModel.getOne(element.screening,(err,movie) => {
+                screeningModel.getOne({_id:element.screening},(err,movie) => {
                   if (err) throw err
-                  console.log(screening)
                   if (movie) {
                     transObj['title'] = movie.title
-                    transObj['date'] = element.date
+                    transObj['date'] = movie.datetxt
                     transObj['seats'] = element.seats
-                    if (element.date < today)
+                    if (element.date > today)
                       transObj['status'] = 'Completed' /* placeholder */
                     else
                       transObj['status'] = 'Reserved'
-                    transArray.push(transObj)
+                    slotModel.getMovie({_id:element.slot},(err,result) => {
+                      if(err) throw err
+                      if (result) {
+                        transObj['start'] = result.slotStart
+                        transObj['end'] = result.slotEnd
+                        transArray.push(transObj)
+                        console.log(transArray)
+                      }
+                    })
                   }
                 })
-              })
-              res.render('BigBrain_TransactionHistory', {
-                user:user,
-                pageCSS: "BigBrain_TransactionHistory",
-                pageTitle: "Transaction History",
-                header: "header",
-                footer: "footer",
-                transactions: transArray
               })
             }
           })
@@ -451,16 +511,15 @@ app.get('/movies', function(req, res) {
     var screens3 = [];
     var username;
 
-      screeningModel.forMovies({date: today}, (err, result) => {
+      screeningModel.getAll({date: today}, (err, result) => {
           result.forEach(function(doc) {
           screens1.push(doc);
         });
-        console.log(screens1[0].slots);
-        screeningModel.forMovies({date: tom}, (err, result) => {
+        screeningModel.getAll({date: tom}, (err, result) => {
             result.forEach(function(doc) {
             screens2.push(doc);
           });
-          screeningModel.forMovies({date: next}, (err, result) => {
+          screeningModel.getAll({date: next}, (err, result) => {
               result.forEach(function(doc) {
               screens3.push(doc);
           });
@@ -511,28 +570,56 @@ app.post('/searchScreening', function(req, res) {
 /* checkout page */
 app.get('/checkout', function (req,res) {
   var user
+  var username
   var today = new Date(2020, 4, 9);
-  if (req.session.fullname != null)
+  var sort = {seatNum: 1}
+  if (req.session.fullname != null) {
     user = req.session.user
+    username = req.session.fullname
+  }
   else
-    user = 'false'
+    user = false
   if (user) {
-    userModel.getOne({_id:user},(err,client) => {
+    userModel.getOne({_id:'3eaeb86894873f1464ff4d00'},(err,client) => {
       if (err) throw err
-      console.log(client)
       if (client) {
-        seatModel.getUserSeats(client,(err,seats) => {
+        seatModel.getUserSeats(client,sort,(err,seats) => {
           if (err) throw err
-          console.log(seats)
           if (seats) {
-            res.render('BigBrain_Checkout', {
-              user: user,
-              pageCSS: "BigBrain_Checkout",
-              pageJS: "BigBrain_Checkout",
-              pageTitle: "Checkout",
-              header: "header",
-              footer: "footer",
-              seats: seats,
+            var seatArray =[];
+            var mov = {};
+            seats.forEach(item => {
+              var seatObj = {};
+              seatObj['seatNum'] = item.seatNum
+              seatArray.push(seatObj)
+              mov = item.slot
+            })
+            slotModel.getMovie({_id:mov},(err,slot) => {
+              if (err) throw err
+              console.log(slot)
+              if (slot){
+                screeningModel.getOne({_id:slot.screening},(err,screening) => {
+                  if (err) throw err
+                  if (screening) {
+                    var totalPrice = screening.price * seatArray.length
+                    console.log(seatArray)
+                    res.render('BigBrain_Checkout', {
+                      user: username,
+                      pageCSS: "BigBrain_Checkout",
+                      pageJS: "BigBrain_Checkout",
+                      pageTitle: "Checkout",
+                      header: "header",
+                      footer: "footer",
+                      seats: seatArray,
+                      title: screening.title,
+                      img: screening.posterUrl,
+                      slotStart: slot.slotStart,
+                      slotEnd: slot.slotEnd,
+                      cost: totalPrice
+                    })
+                  }
+                })
+              }
             })
           }
         })

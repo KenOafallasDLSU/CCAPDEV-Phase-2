@@ -29,5 +29,11 @@ exports.getAll = (query, next) => {
 
 // get one slot matching query parameter
 exports.getOne = (query) => {
-  return slotModel.findOne(query).exec()
+   slotModel.findOne(query).exec()
+};
+
+exports.getMovie = (query, next) => {
+  slotModel.findOne(query, (err, slot) => {
+      next(err, slot);
+  });
 };

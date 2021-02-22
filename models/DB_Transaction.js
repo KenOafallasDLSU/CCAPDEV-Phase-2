@@ -6,14 +6,15 @@ const TransactionSchema = new mongoose.Schema(
         creditCardNum: {type: Number, required: true},
         client: {type: mongoose.Schema.Types.ObjectId, ref:"User", required: true},
         screening: {type: mongoose.Schema.Types.ObjectId, ref: "Screenings", required: true},
-        seats: [{type: mongoose.Schema.Types.ObjectId, ref:"Seat", required: true}]
+        slot: {type:mongoose.Schema.Types.ObjectId,ref:'Slot',required: true},
+        seats: [{type: String, required: true}]
     },
     {
         toObject: { virtuals: true },
         toJSON: { virtuals: true }
     }
 );
-
+/*
 TransactionSchema.virtual("status")
     .get(function() {
         var status = "To Be Shown";
@@ -41,8 +42,8 @@ TransactionSchema.virtual("totalPrice")
 
 const transactionModel = mongoose.model('Transactions', TransactionSchema);
 
-exports.getUserTransactions = (user, next) => {
-    transactionModel.find({client: user}).exec((err, orders) => {
+exports.getUserTransactions = (user,sort, next) => {
+    transactionModel.find({client: user}).sort(sort).exec((err, orders) => {
         if (err) throw err;
         const transactions = [];
         orders.forEach((doc) => {
