@@ -12,10 +12,11 @@ function checkSeatForm(){
 }
 
 $(document).ready(function() {
-    $.post("getSeatStatus", {slot: "5ec0c846ca85a61340446897"}, function(data, status) {
+    $.post("getSeatStatus", function(data, status) {
         data.forEach((item, i) => {
-            if(item.status == "U" || item.status == "R")
+            if(item.status == "U" || item.status == "R"){
                 $("#".concat(item.seatNum)).attr("disabled", true);
+            }
         });
     });
 
@@ -54,7 +55,7 @@ $(document).ready(function() {
         if(checkSeatForm() == true)
         {
             //console.log(reservedSeats)
-            $.post("reserveSeats", {slot: "5ec0c846ca85a61340446897", reservedSeats: reservedSeats}, function(data, status) {
+            $.post("reserveSeats", {reservedSeats: reservedSeats}, function(data, status) {
 
             });
         }
