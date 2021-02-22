@@ -11,7 +11,7 @@ const session = require('express-session');
 const flash = require('connect-flash');
 const ObjectId = require('mongodb').ObjectId;
 const MongoStore = require('connect-mongo')(session);
-const {envPort, sessionKey} = require('./config');
+const {envPort, dbURL, sessionKey} = require('./config');
 const methodOverride = require('method-override');
 const {allowInsecurePrototypeAccess} = require('@handlebars/allow-prototype-access')
 
@@ -22,7 +22,7 @@ const port = envPort || 3000;
 
 //Define all database connection constants
 const mongoClient = mongodb.MongoClient;
-const databaseURL = "mongodb+srv://OafallasKenneth:a1b2c3d4@ccapdev-mp-bigbrainmovies-mubsx.gcp.mongodb.net/BigBrainDB?retryWrites=true&w=majority";
+const databaseURL = dbURL
 const dbname = "BigBrainDB";
 
 //models
@@ -39,52 +39,69 @@ const {userRegisterValidation, userLoginValidation} = require('./validators.js')
 const options = { useUnifiedTopology: true };
 
 /*************Multer File Uploads */
-/*
 const crypto = require("crypto");
-const mongoose = require("mongoose");
 const multer = require("multer");
 const GridFsStorage = require("multer-gridfs-storage");
-
-const mongoURI = 'mongodb://localhost:27017/mpdb';
-
-const conn = mongoose.createConnection(mongoURI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-});
+const Grid = require('gridfs-stream');
 
 // init gfs
 let gfs;
+const conn = mongoose.createConnection(databaseURL)
 conn.once("open", () => {
-    // init stream
-    gfs = new mongoose.mongo.GridFSBucket(conn.db, {
-      bucketName: "uploads"
-    });
+  // Init stream
+  gfs = Grid(conn.db, mongoose.mongo);
+  gfs.collection('posters');
 });
 
-// Storage
+// Create storage engine
 const storage = new GridFsStorage({
-    url: mongoURI,
-    file: (req, file) => {
-      return new Promise((resolve, reject) => {
-        crypto.randomBytes(16, (err, buf) => {
-          if (err) {
-            return reject(err);
-          }
-          const filename = buf.toString("hex") + path.extname(file.originalname);
-          const fileInfo = {
-            filename: filename,
-            bucketName: "uploads"
-          };
-          resolve(fileInfo);
-        });
+  url: databaseURL,
+  file: (req, file) => {
+    return new Promise((resolve, reject) => {
+      //crypto.randomBytes(16, (err, buf) => {
+      //  if (err) {
+      //    return reject(err);
+      //  }
+      //  const filename = buf.toString('hex') + path.extname(file.originalname);
+        const fileInfo = {
+          filename: file.originalname, //filename,
+          bucketName: 'posters'
+        };
+        resolve(fileInfo);
+      //});
+    });
+  }
+});
+const upload = multer({ storage });
+
+app.post('/upload', upload.single('posterSubmit'), (req, res) => {
+  // res.json({ file: req.file });
+  // res.redirect('/');
+});
+
+// @route GET /image/:filename
+// @desc Display Image
+app.get('/:prefix?/image/:filename', (req, res) => {
+  gfs.files.findOne({ filename: req.params.filename }, (err, file) => {
+    // Check if file
+    if (!file || file.length === 0) {
+      return res.status(404).json({
+        err: 'No file exists'
       });
     }
-});
 
-const upload = multer({
-    storage
+    // Check if image
+    if (file.contentType === 'image/jpeg' || file.contentType === 'image/png') {
+      // Read output to browser
+      const readstream = gfs.createReadStream(file.filename);
+      readstream.pipe(res);
+    } else {
+      res.status(404).json({
+        err: 'Not an image'
+      });
+    }
+  });
 });
-*/
 /******************************** */
 
 //create engine
@@ -97,9 +114,12 @@ app.engine('hbs', exphbs({
 }));
 
 app.set('view engine', 'hbs');
+
+//middleware
+app.use('/static', express.static(path.join(__dirname, 'public')))
+app.use(express.static('public'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
 app.use(methodOverride("_method"));
 
 // sessions - server configuration
@@ -121,13 +141,13 @@ app.use((req, res, next) => {
   next();
 });
 
-/* Employee Services posts */
+/*
 app.post("/addScreening", function(req, res) {
   const screening = new screeningModel({
     date: req.body.date,
     screenNum: req.body.screenNum,
     title: req.body.title,
-      //poster
+    posterUrl: req.body.poster,
     desc: req.body.desc,
     rating: req.body.rating,
     duration: req.body.duration,
@@ -137,99 +157,71 @@ app.post("/addScreening", function(req, res) {
     time3: req.body.time3start
   });
 
-  mongoClient.connect(databaseURL, options, function(err, client) {
-    if(err) throw err;
-    const dbo = client.db(dbname);
+  screeningModel.insertOne(screening, function(err, res1) {
+    if (err) throw err;
+    const screeningId = res1.ops[0]
 
-    dbo.collection("screenings").insertOne(screening, function(err, res) {
+    const slot1 = new slotModel({
+      screening: screeningId,
+      slotOrder: 1,
+      slotStart: req.body.time1start,
+      slotEnd: req.body.time1end
+    });
+    const slot2 = new slotModel({
+      screening: screeningId,
+      slotOrder: 2,
+      slotStart: req.body.time2start,
+      slotEnd: req.body.time2end
+    });
+    const slot3 = new slotModel({
+      screening: screeningId,
+      slotOrder: 3,
+      slotStart: req.body.time3start,
+      slotEnd: req.body.time3end
+    });
+
+    dbo.collection("slots").insertMany([slot1, slot2, slot3], function(err, res2) {
       if (err) throw err;
-        //console.log("1 screening inserted");
-        //client.close();
 
-        dbo.collection("screenings").findOne({date: screening.date, screenNum: screening.screenNum}, function(err, result) {
-          if(err) throw err;
+      console.log(res2)
 
-          var screeningId;
-          screeningId = result._id;
+      let aSeats = [];
+      let letter = 'A';
+      let number = 1;
 
-          const slot1 = new slotModel({
-            screening: screeningId,
-            slotOrder: 1,
-            slotStart: req.body.time1start,
-            slotEnd: req.body.time1end
-          });
-          const slot2 = new slotModel({
-            screening: screeningId,
-            slotOrder: 2,
-            slotStart: req.body.time2start,
-            slotEnd: req.body.time2end
-          });
-          const slot3 = new slotModel({
-            screening: screeningId,
-            slotOrder: 3,
-            slotStart: req.body.time3start,
-            slotEnd: req.body.time3end
-          });
+      for(let slotNum = 0; slotNum < 3; slotNum++){
+        letter = 'A';
+        number = 1;
 
-          dbo.collection("slots").insertMany([slot1, slot2, slot3], function(err, res) {
-            if (err) throw err;
-            //console.log("3 slots inserted");
-            //client.close();
+        for(let i = 0; i < 10; i++){
+          for(let j = 0; j < 10; j++){
+            const tempSeat = seatModel({
+              seatNum: String.fromCharCode(letter.charCodeAt() + i).concat(number + j),
+              status: "A",
+              slot: result2[slotNum]._id
+            });
 
-            dbo.collection("screenings").findOne({date: screening.date, screenNum: screening.screenNum}, function(err, result1) {
-              if(err) throw err;
-              var screeningId;
-              screeningId = result1._id;
+            aSeats.push(tempSeat);
+          }
+        }
+      }
 
-              dbo.collection("slots").find({screening: screeningId}).toArray(function(err, result2) {
-                if (err) throw err;
-
-                //console.log(result2);
-
-                var aSeats = [];
-                var letter = 'A';
-                var number = 1;
-
-                var i = 0, j = 0, slotNum = 0;
-                for(slotNum = 0; slotNum < 3; slotNum++)
-                {
-                  letter = 'A';
-                  number = 1;
-
-                  for(i = 0; i < 10; i++)
-                  {
-                    for(j = 0; j < 10; j++)
-                    {
-                      var tempSeat = seatModel({
-                        seatNum: String.fromCharCode(letter.charCodeAt() + i).concat(number + j),
-                        status: "A",
-                        slot: result2[slotNum]._id
-                      });
-
-                      aSeats.push(tempSeat);
-                    }
-                  }
-                }
-
-                dbo.collection("seats").insertMany(aSeats, function(err, res) {
-                  if (err) throw err;
-                  //console.log("300 seats inserted");
-                  client.close();
-                });
-              });
-          });
-        });
+      dbo.collection("seats").insertMany(aSeats, function(err, res3) {
+        if (err) throw err;
+        //console.log("300 seats inserted");
       });
     });
   });
 });
+*/
 
 /**
  * POST route
  * get statis of seats, whether A,R,U
  */
-app.post('/getSeatStatus', function(req, res) {  
-  seatModel.find().where("slot", ObjectId(req.body.slot))
+app.post('/seatSelection/getSeatStatus', function(req, res) {  
+  //console.log("Status of " + req.session.slot)
+  seatModel.find().where("slot", ObjectId(req.session.slot))
   .exec(function(err, result) {
     if(err) throw err;
     res.send(result);
@@ -240,8 +232,10 @@ app.post('/getSeatStatus', function(req, res) {
  * POST route
  * updates seats selected to Reserved then redirects to checkout
  */
-app.post("/reserveSeats", function(req, res) {
-  seatModel.updateMany({slot: ObjectId(req.body.slot), seatNum: {$in: req.body.reservedSeats}}, {$set: {status: "R", owner: ObjectId("3eaeb86894873f1464ff4d00"/*hardcoded client user*/)}}, function(err, result) {
+app.post("/seatSelection/reserveSeats", function(req, res) {
+  //console.log("Reserving for " + req.session.slot)
+  //console.log("Reserving " + req.body.reservedSeats)
+  seatModel.updateMany({slot: ObjectId(req.session.slot), seatNum: {$in: req.body.reservedSeats}}, {$set: {status: "R", owner: ObjectId(req.session.user)}}, function(err, result) {
     if (err) throw err;
     res.redirect('/checkout');
   });
@@ -251,7 +245,8 @@ app.post("/reserveSeats", function(req, res) {
  * Render seatSelection page
  */
 app.get("/seatSelection/:slotid", async (req, res) => {
-  let currSlotId = req.params.slotid
+  req.session.slot = req.params.slotid
+  let currSlotId = req.session.slot
   let slot = await slotModel.getOne({"_id": ObjectId(currSlotId)})
 
   screeningModel.getOne({"_id": slot.screening}, function(err, result) {
@@ -278,29 +273,16 @@ app.get("/seatSelection/:slotid", async (req, res) => {
 });
 
 app.get("/employeeFacing", function(req, res) {
-  mongoClient.connect(databaseURL, options, function(err, client) {
-    if(err) throw err;
-    const dbo = client.db(dbname);
+  res.render("BigBrain_EmployeeFacing", {
+    //header
+    user: req.session.fullname,
 
-    //user's name
-    dbo.collection("users").findOne({"_id": ObjectId("5ec0cd81474d4f15d0f4fd0a"/*hardcoded employee user*/)}, function(err, resultUser) {
-      if(err) throw err;
-      var user = resultUser;
-
-      client.close();
-
-      res.render("BigBrain_EmployeeFacing", {
-        //header
-        user: user,
-
-        //head
-        pageCSS: "BigBrain_EmployeeFacing",
-        pageJS: "BigBrain_EmployeeFacing",
-        pageTitle: "Employee Service",
-        header: "BigBrain_EmployeeHeader",
-        footer: "BigBrain_EmployeeFooter"
-      });
-    });
+    //head
+    pageCSS: "BigBrain_EmployeeFacing",
+    pageJS: "BigBrain_EmployeeFacing",
+    pageTitle: "Employee Service",
+    header: "BigBrain_EmployeeHeader",
+    footer: "BigBrain_EmployeeFooter"
   });
 });
 
@@ -460,11 +442,6 @@ app.get('/logout', (req, res) => {
     });
   };
 });
-
-
-
-//static hosting
-app.use(express.static('public'));
 
 app.listen(port, function() {
   console.log('App listening at port ' + port);
