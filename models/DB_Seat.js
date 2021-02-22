@@ -34,3 +34,15 @@ exports.getOne = (query, next) => {
         next(err, slot);
     });
   };
+
+exports.getSeatsOfSlot = (slot, next) => {
+    seatsModel.find().where("slot", slot).exec((err, result) => {
+        next(err, result);
+    });
+}
+
+exports.reserveSeats = (query, update, next) => {
+    seatsModel.updateMany(query, update, function(err, result) {
+        next(err, result)
+    });
+}
