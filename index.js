@@ -30,7 +30,7 @@ const userModel = require('./models/DB_User');
 const screeningModel = require('./models/DB_Screening');
 const slotModel = require('./models/DB_Slot');
 const seatModel = require('./models/DB_Seat');
-//const transactionModel = require('./models/DB_Transaction');
+const transactionModel = require('./models/DB_Transaction');
 
 //others
 const bcrypt = require('bcrypt');
@@ -378,7 +378,7 @@ app.get('/checkout', function (req,res) {
   else
     user = false
   if (user) {
-    userModel.getOne({_id:'3eaeb86894873f1464ff4d00'},(err,client) => {
+    userModel.getOne({_id:user},(err,client) => {
       if (err) throw err
       if (client) {
         seatModel.getUserSeats(client,sort,(err,seats) => {
@@ -437,7 +437,7 @@ app.get('/transactions',function(req,res) {
   else
     user = false
   if (user){
-    userModel.getOne({_id:'3eaeb86894873f1464ff4d00'}, (err,client) => {
+    userModel.getOne({_id:user}, (err,client) => {
       if (err) {
         console.log("error")
         throw err

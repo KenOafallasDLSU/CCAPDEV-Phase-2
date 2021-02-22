@@ -1,8 +1,30 @@
+*, *:before, *:after {
+    box-sizing: border-box;
+}
+
+.grid {
+    display:grid;
+    grid-template-columns: repeat(10, 1fr);
+    grid-gap: 0.5em;
+}
+
+html {
+    font-size: 16px;
+}
+
+#checkout-num {
+    grid-column-start: 3;
+    grid-column-end: span 2;
+  
+    font-size: 2.3em;
+    font-weight: bold;
+}
+
 .wrapper{
     display:grid;
-    grid-template-columns: 3fr 2fr;
+    grid-template-columns: 1fr 2fr;
     grid-gap:1em;
-    grid-auto-rows:minmax(100px,auto);
+    grid-auto-rows:minmax(60vh,auto);
 }
 
 .nested{
@@ -38,5 +60,5 @@
 
 #poster {
     max-height: 60vh;
-    min-height: 300px;
+    min-height: 200px;
   }

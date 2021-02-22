@@ -1,15 +1,39 @@
+*, *:before, *:after {
+    box-sizing: border-box;
+}
+
+.grid {
+    display:grid;
+    grid-template-columns: repeat(10, 1fr);
+    grid-gap: 0.5em;
+}
+
+html {
+    font-size: 16px;
+}
+
+#transaction-num {
+    grid-column-start: 3;
+    grid-column-end: span 2;
+  
+    font-size: 2.3em;
+    font-weight: bold;
+}
 .wrapper{
     display:grid;
-
     grid-template-columns: 1fr 1fr 2fr 1fr 1fr;
-    grid-gap: 1em;
+    grid-gap: 0.5em;
 
+}
+
+.head {
+    font-weight: bold;
 }
 
 .wrapper > div{
-    padding: 1em
+    padding: 1em;
 }
 
-.date, .slot{
+.movie, .seats, .status{
     background: #fdecf6;
 }
