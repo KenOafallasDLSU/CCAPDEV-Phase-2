@@ -1,0 +1,39 @@
+<div class = 'container'>
+	<h2><strong>Movie Screenings</strong></h2>
+    <div class = 'wrapper'>
+        <div class ='box box1'>
+            <img id="poster" src="image/{{img}}">
+        </div>
+        <div class = 'nested'>
+            <div>
+                <strong>Movie:</strong><br>
+                {{title}}
+            </div>
+            <div>
+                <strong>
+                    Slot:
+                </strong> <br>
+                {{slotStart}} - {{slotEnd}}
+            </div>
+            <div>
+                <strong>Seats:</strong><br>
+                <div class = 'seats'>
+                {{#each seats}}
+                    {{this.seatNum}}
+                {{/each}}
+                </div>
+            </div>
+            <div>
+                <strong>Total Cost:</strong><br>
+                {{cost}}
+            </div>
+            <div>
+                <button class = 'btn btn-primary' id = 'checkout'>Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<br><br><br><br>
+<br><br><br><br>
+<br><br>

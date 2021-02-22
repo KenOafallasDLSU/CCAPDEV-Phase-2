@@ -6,7 +6,8 @@ const TransactionSchema = new mongoose.Schema(
         creditCardNum: {type: Number, required: true},
         client: {type: mongoose.Schema.Types.ObjectId, ref:"User", required: true},
         screening: {type: mongoose.Schema.Types.ObjectId, ref: "Screenings", required: true},
-        seats: [{type: mongoose.Schema.Types.ObjectId, ref:"Seat", required: true}]
+        slot: {type:mongoose.Schema.Types.ObjectId,ref:'Slot',required: true},
+        seats: [{type: String, required: true}]
     },
     {
         toObject: { virtuals: true },
@@ -14,6 +15,7 @@ const TransactionSchema = new mongoose.Schema(
     }
 );
 
+/*
 TransactionSchema.virtual("status")
     .get(function() {
         var status = "To Be Shown";
@@ -31,4 +33,31 @@ TransactionSchema.virtual("seatCount")
         return this.seats.length;
     });
 
-module.exports = mongoose.model('transactions', TransactionSchema);
+/*
+TransactionSchema.virtual("totalPrice")
+    .get(function() {
+        //might not werk
+        return this.seats.length * this.screening.price;
+    });
+*/
+
+const transactionModel = mongoose.model('Transactions', TransactionSchema);
+
+exports.getUserTransactions = (user,sort, next) => {
+    transactionModel.find({client: user}).sort(sort).exec((err, orders) => {
+        if (err) throw err;
+        const transactions = [];
+        orders.forEach((doc) => {
+            transactions.push(doc.toObject());
+        });
+        next(err,transactions);
+    })
+}
+
+exports.create = (object,next) => {
+    const newTransaction = new transactionModel(object)
+    newTransaction.save((err,transaction) => {
+        next(err,transaction)
+    })
+}
+//module.exports = mongoose.model('Transaction', TransactionSchema);

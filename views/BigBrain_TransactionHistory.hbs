@@ -1,0 +1,47 @@
+<div class='container'>
+	<h2><strong>Transaction History</strong></h2>
+    {{#if transactions}}
+    <div class = 'wrapper'>
+        <div>
+            Movie
+        </div>
+        <div class = 'date'>
+            Date
+        </div>
+        <div>
+            Seats
+        </div>
+        <div class = 'slot'>
+            Slot
+        </div>
+        <div>
+            Status
+        </div>
+        {{#each transactions}}
+        <div>
+            {{title}}
+        </div>
+        <div class = 'date'>
+            {{date}}
+        </div>
+        <div>
+            {{seats}}
+        </div>
+        <div class = 'slot'>
+            {{start}} - {{end}}
+        </div>
+        <div>
+            {{status}}
+        </div>
+        {{/each}}
+    </div>
+    {{else}}
+    You have not yet done any transactions.
+    {{/if}}
+</div>
+
+<br><br><br><br><br>
+<br><br><br><br><br>
+<br><br><br><br><br>
+<br><br><br><br><br>
+<br><br><br>

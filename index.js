@@ -365,6 +365,129 @@ app.post('/user-login', userLoginValidation, (req, res) => {
   }
 });
 
+/* checkout page */
+app.get('/checkout', function (req,res) {
+  var user
+  var username
+  var today = new Date(2020, 4, 9);
+  var sort = {seatNum: 1}
+  if (req.session.fullname != null) {
+    user = req.session.user
+    username = req.session.fullname
+  }
+  else
+    user = false
+  if (user) {
+    userModel.getOne({_id:'3eaeb86894873f1464ff4d00'},(err,client) => {
+      if (err) throw err
+      if (client) {
+        seatModel.getUserSeats(client,sort,(err,seats) => {
+          if (err) throw err
+          if (seats) {
+            var seatArray =[];
+            var mov = {};
+            seats.forEach(item => {
+              var seatObj = {};
+              seatObj['seatNum'] = item.seatNum
+              seatArray.push(seatObj)
+              mov = item.slot
+            })
+            slotModel.getMovie({_id:mov},(err,slot) => {
+              if (err) throw err
+              console.log(slot)
+              if (slot){
+                screeningModel.getOne({_id:slot.screening},(err,screening) => {
+                  if (err) throw err
+                  if (screening) {
+                    var totalPrice = screening.price * seatArray.length
+                    console.log(seatArray)
+                    res.render('BigBrain_Checkout', {
+                      user: username,
+                      pageCSS: "BigBrain_Checkout",
+                      pageJS: "BigBrain_Checkout",
+                      pageTitle: "Checkout",
+                      header: "header",
+                      footer: "footer",
+                      seats: seatArray,
+                      title: screening.title,
+                      img: screening.posterUrl,
+                      slotStart: slot.slotStart,
+                      slotEnd: slot.slotEnd,
+                      cost: totalPrice
+                    })
+                  }
+                })
+              }
+            })
+          }
+        })
+      }
+    })
+  }
+})
+
+/* transaction history page */
+
+app.get('/transactions',function(req,res) {
+  var user
+  var today = new Date(2020, 4, 9);
+  var sort = {date: 1}
+  if (req.session.fullname != null)
+    user = req.session.user
+  else
+    user = false
+  if (user){
+    userModel.getOne({_id:'3eaeb86894873f1464ff4d00'}, (err,client) => {
+      if (err) {
+        console.log("error")
+        throw err
+      }
+      if (client) {
+        var transArray =[]
+        var transObj = {};
+        transactionModel.getUserTransactions(client, sort,(err, transactions) => {
+          if (err) throw err
+          if (transactions) {
+            setTimeout(function(){
+              res.render('BigBrain_TransactionHistory', {
+                user: client.full_name,
+                pageCSS: "BigBrain_TransactionHistory",
+                pageTitle: "Transaction History",
+                header: "header",
+                footer: "footer",
+                transactions: transArray
+              })
+            },1000)
+            transactions.forEach(element =>{
+              screeningModel.getOne({_id:element.screening},(err,movie) => {
+                if (err) throw err
+                if (movie) {
+                  transObj['title'] = movie.title
+                  transObj['date'] = movie.datetxt
+                  transObj['seats'] = element.seats
+                  if (element.date > today)
+                    transObj['status'] = 'Completed' /* placeholder */
+                  else
+                    transObj['status'] = 'Reserved'
+                  slotModel.getMovie({_id:element.slot},(err,result) => {
+                    if(err) throw err
+                    if (result) {
+                      transObj['start'] = result.slotStart
+                      transObj['end'] = result.slotEnd
+                      transArray.push(transObj)
+                      console.log(transArray)
+                    }
+                  })
+                }
+              })
+            })
+          }
+        })
+      }
+    })
+  }
+})
+
 /* Screenings Page */
 app.get('/movies', function(req, res) {
     var today = new Date(2020, 4, 9); //hardcoded dates

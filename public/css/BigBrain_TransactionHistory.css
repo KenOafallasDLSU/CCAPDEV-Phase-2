@@ -1,0 +1,15 @@
+.wrapper{
+    display:grid;
+
+    grid-template-columns: 1fr 1fr 2fr 1fr 1fr;
+    grid-gap: 1em;
+
+}
+
+.wrapper > div{
+    padding: 1em
+}
+
+.date, .slot{
+    background: #fdecf6;
+}

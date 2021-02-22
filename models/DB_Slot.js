@@ -31,3 +31,9 @@ exports.getAll = (query, next) => {
 exports.getOne = (query) => {
   return slotModel.findOne(query).exec()
 };
+
+exports.getMovie = (query, next) => {
+  slotModel.findOne(query, (err, slot) => {
+      next(err, slot);
+  });
+};
