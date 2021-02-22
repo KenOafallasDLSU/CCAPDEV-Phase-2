@@ -13,5 +13,24 @@ const SeatSchema = new mongoose.Schema(
     }
 );
 
-module.exports = mongoose.model('seats', SeatSchema);
+//module.exports = mongoose.model('seats', SeatSchema);
 
+
+const seatsModel = mongoose.model('Seats',SeatSchema)
+
+exports.getUserSeats = (user,sort,next) => {
+    var objArr = []
+    seatsModel.find({owner: user}).sort(sort).exec((err,seats) => {
+        seats.forEach(item => {
+            if (item.status == 'R')
+            objArr.push(item)
+        })
+        next(err,objArr)
+    })
+}
+
+exports.getOne = (query, next) => {
+    seatsModel.findOne(query, (err, slot) => {
+        next(err, slot);
+    });
+  };

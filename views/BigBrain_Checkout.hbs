@@ -1,0 +1,49 @@
+
+    <div class = 'grid'>
+        <div id = 'checkout-num'>
+    	    Checkout
+        </div>
+    </div>
+<br>
+<div class = 'container'>
+    <div class = 'wrapper'>
+        <div class ='box box1 align-middle'>
+            <img id="poster" src="image/{{img}}">
+        </div>
+        <div class = 'nested'>
+            <div>
+                <strong>Movie:</strong><br>
+                {{title}}
+            </div>
+            <div>
+                <strong>
+                    Slot:
+                </strong> <br>
+                {{slotStart}} - {{slotEnd}}
+            </div>
+            <div>
+                <strong>Seats:</strong><br>
+                <div class = 'seats'>
+                {{#each seats}}
+                    {{this.seatNum}}
+                {{/each}}
+                </div>
+            </div>
+            <div>
+                <strong>Total Cost:</strong><br>
+                {{cost}} pesos
+            </div>
+            <div>
+                <strong>Credit Card:</strong>
+                <input name = 'cardnum' type = 'text' class = 'form-control'>
+            </div>
+            <div>
+                <button class = 'btn btn-primary' id = 'checkout'>Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<br><br><br><br>
+<br><br><br><br>
+<br><br>

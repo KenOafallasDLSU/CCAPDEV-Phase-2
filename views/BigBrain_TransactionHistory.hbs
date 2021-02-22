@@ -1,0 +1,53 @@
+
+    <div class = 'grid'>
+        <div id = 'transaction-num'>
+	        Transaction History
+        </div>
+    </div>
+<br>
+<div class='container'>
+    {{#if transactions}}
+    <div class = 'wrapper'>
+        <div class = 'movie head'>
+            Movie
+        </div>
+        <div class = 'date head'>
+            Date
+        </div>
+        <div class = 'seats head'>
+            Seats
+        </div>
+        <div class = 'slot head'>
+            Slot
+        </div>
+        <div class = 'status head'>
+            Status
+        </div>
+        {{#each transactions}}
+        <div class = 'movie'>
+            {{title}}
+        </div>
+        <div class = 'date'>
+            {{date}}
+        </div>
+        <div class = 'seats'>
+            {{seats}}
+        </div>
+        <div class = 'slot'>
+            {{start}} - {{end}}
+        </div>
+        <div class = 'status'>
+            {{status}}
+        </div>
+        {{/each}}
+    </div>
+    {{else}}
+    You have not yet done any transactions.
+    {{/if}}
+</div>
+
+<br><br><br><br><br>
+<br><br><br><br><br>
+<br><br><br><br><br>
+<br><br><br><br><br>
+<br><br><br>
