@@ -13,7 +13,8 @@ const ObjectId = require('mongodb').ObjectId;
 const MongoStore = require('connect-mongo')(session);
 const {envPort, dbURL, sessionKey} = require('./config');
 const methodOverride = require('method-override');
-const {allowInsecurePrototypeAccess} = require('@handlebars/allow-prototype-access')
+const {allowInsecurePrototypeAccess} = require('@handlebars/allow-prototype-access');
+const {isCustomer, isEmp} = require('./middlewares/checkRoutes.js')
 
 
 //creates express app
@@ -219,7 +220,7 @@ app.post("/addScreening", function(req, res) {
  * POST route
  * get statis of seats, whether A,R,U
  */
-app.post('/seatSelection/getSeatStatus', function(req, res) {  
+app.post('/seatSelection/getSeatStatus', isCustomer, function(req, res) {
   //console.log("Status of " + req.session.slot)
   seatModel.find().where("slot", ObjectId(req.session.slot))
   .exec(function(err, result) {
@@ -232,7 +233,7 @@ app.post('/seatSelection/getSeatStatus', function(req, res) {
  * POST route
  * updates seats selected to Reserved then redirects to checkout
  */
-app.post("/seatSelection/reserveSeats", function(req, res) {
+app.post("/seatSelection/reserveSeats", isCustomer, function(req, res) {
   //console.log("Reserving for " + req.session.slot)
   //console.log("Reserving " + req.body.reservedSeats)
   seatModel.updateMany({slot: ObjectId(req.session.slot), seatNum: {$in: req.body.reservedSeats}}, {$set: {status: "R", owner: ObjectId(req.session.user)}}, function(err, result) {
@@ -244,7 +245,7 @@ app.post("/seatSelection/reserveSeats", function(req, res) {
 /**
  * Render seatSelection page
  */
-app.get("/seatSelection/:slotid", async (req, res) => {
+app.get("/seatSelection/:slotid", isCustomer, async (req, res) => {
   req.session.slot = req.params.slotid
   let currSlotId = req.session.slot
   let slot = await slotModel.getOne({"_id": ObjectId(currSlotId)})
@@ -252,6 +253,8 @@ app.get("/seatSelection/:slotid", async (req, res) => {
   screeningModel.getOne({"_id": slot.screening}, function(err, result) {
     if(err) throw err;
     var screening = result;
+
+
 
     res.render("BigBrain_Seats", {
       //header
@@ -272,7 +275,7 @@ app.get("/seatSelection/:slotid", async (req, res) => {
   });
 });
 
-app.get("/employeeFacing", function(req, res) {
+app.get("/employeeFacing", isEmp, function(req, res) {
   res.render("BigBrain_EmployeeFacing", {
     //header
     user: req.session.fullname,
@@ -346,7 +349,11 @@ app.post('/user-login', userLoginValidation, (req, res) => {
             if (result) {
               req.session.user = user._id;
               req.session.fullname = user.full_name;
-              res.redirect('/movies');
+              req.session.type = user.usertype;
+              if (user.usertype == 'C')
+                res.redirect('/movies');
+              else
+                res.redirect('/employeeFacing')
             } else {
               req.flash('error_msg', 'Incorrect password. Please try again.');
               res.redirect('/');
@@ -389,7 +396,7 @@ app.get('/movies', function(req, res) {
               screens3.push(doc);
           });
 
-          if (req.session.fullname != null)
+          if (req.session.fullname != null && req.session.type == 'C')
             username= req.session.fullname;
           else
             username= "guest";
