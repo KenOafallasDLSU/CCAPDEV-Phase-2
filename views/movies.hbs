@@ -9,14 +9,15 @@
         <a class='pull-left' href='#'>
           <img class="media-object movie-img" src="image/{{this.posterUrl}}">
         </a>
-        <div class='media-body'>
+        <div class='media-body para'>
           <h4>{{this.title}}<small> Screen {{this.screenNum}}</small></h4>
-          <p class='text-muted'>
+          <p>
             Runtime: {{this.duration}} Minutes<br>
             Rating: {{this.rating}}<br>
             {{this.price}} PHP<br><br>
+						<strong>Timeslots:</strong><br>
 						{{#each this.slots}}
-            	<a class="slotlink" style='color: blue' slotid={{this._id}}>{{this.slotStart}} - {{this.slotEnd}}</a><br>
+            	<a class="slotlink slot-font" style='color: blue' slotid={{this._id}}>{{this.slotStart}} - {{this.slotEnd}}</a><br>
 						{{/each}}
             <div class='text-justify text-muted'>
               {{this.desc}}
@@ -33,18 +34,19 @@
 <h4 class='text-muted'>{{date2}}</h4>
 {{#if day2}}
       {{#each day2}}
-      <div class='media'>
+			<div class='media'>
         <a class='pull-left' href='#'>
           <img class="media-object movie-img" src="image/{{this.posterUrl}}">
         </a>
-        <div class='media-body'>
+        <div class='media-body para'>
           <h4>{{this.title}}<small> Screen {{this.screenNum}}</small></h4>
-          <p class='text-muted'>
+          <p>
             Runtime: {{this.duration}} Minutes<br>
             Rating: {{this.rating}}<br>
             {{this.price}} PHP<br><br>
+						<strong>Timeslots:</strong><br>
 						{{#each this.slots}}
-            	<a class="slotlink" style='color: blue' slotid={{this._id}}>{{this.slotStart}} - {{this.slotEnd}}</a><br>
+            	<a class="slotlink slot-font" style='color: blue' slotid={{this._id}}>{{this.slotStart}} - {{this.slotEnd}}</a><br>
 						{{/each}}
             <div class='text-justify text-muted'>
               {{this.desc}}
@@ -61,18 +63,19 @@
 <h4 class='text-muted'>{{date3}}</h4>
 {{#if day3}}
       {{#each day3}}
-      <div class='media'>
+			<div class='media'>
         <a class='pull-left' href='#'>
           <img class="media-object movie-img" src="image/{{this.posterUrl}}">
         </a>
-        <div class='media-body'>
+        <div class='media-body para'>
           <h4>{{this.title}}<small> Screen {{this.screenNum}}</small></h4>
-          <p class='text-muted'>
+          <p>
             Runtime: {{this.duration}} Minutes<br>
             Rating: {{this.rating}}<br>
             {{this.price}} PHP<br><br>
+						<strong>Timeslots:</strong><br>
 						{{#each this.slots}}
-            	<a class="slotlink" style='color: blue' slotid={{this._id}}>{{this.slotStart}} - {{this.slotEnd}}</a><br>
+            	<a class="slotlink slot-font" style='color: blue' slotid={{this._id}}>{{this.slotStart}} - {{this.slotEnd}}</a><br>
 						{{/each}}
             <div class='text-justify text-muted'>
               {{this.desc}}

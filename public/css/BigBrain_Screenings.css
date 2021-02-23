@@ -6,3 +6,12 @@
   height: 500px;
   width: 350px;
 }
+
+.slot-font {
+  font-size: 20px;
+}
+
+.para {
+  position: relative;
+  left: 30px;
+}
