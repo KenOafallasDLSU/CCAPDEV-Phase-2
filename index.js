@@ -447,7 +447,7 @@ app.post('/cancelSeats',function(req,res) {
     userModel.getOne({_id:user}, (err,client) => {
       if (err) throw err
       if (client) {
-        seatModel.reserveSeats({slot:slotp,owner: client},{$set: {status: "A", owner: ObjectId('nilnilnilnil')}},(err,result) => {
+        seatModel.reserveSeats({status:'R',slot:slotp,owner: client},{$set: {status: "A", owner: ObjectId('nilnilnilnil')}},(err,result) => {
           if (err) throw err
           res.send(result)
         })
