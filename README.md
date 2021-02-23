@@ -1,7 +1,13 @@
 ### CCAPDEV-Phase-2
-# Big Brain Movies 
+# s15-mp1
 
-Big Brain Movies is a movie reservation application
+# Big Brain Movies Movie Reservation System
+
+## Team Members:
+
+* OAFALLAS, Kenneth Neil B.
+* JOYA, Patrick Jaspher B.
+* CHUA CHIACO, Ronn Christian C.
 
 ---
 
@@ -47,3 +53,6 @@ For sample screening slot that is sold out, enter Screen 1 "The Room" Slot 2
 username: employee@test.com
 password: p@ssword
 ```
+
+
+
