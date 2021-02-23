@@ -1,5 +1,5 @@
         <div class="container">
-            <h1 id="pageTitle">Update Movie Information for a Specific Screen</h1>
+            <h1 id="pageTitle">Add Movie Information for a Specific Screening</h1>
 
             <!--Screen Update Form-->
             <form name="screenUpdateForm" id="screenUpdateForm" onsubmit="return checkEmployeeForm()"
@@ -26,9 +26,6 @@
                 <div id="screenNumberAlert" role="alert">
                 </div>
                 <div id="dateAlert" role="alert">
-                </div>
-                <div id="currentWarning" class="alert alert-warning col-8" role="alert">
-                    Screens of dates currently active on customer-facing site may not be updated.
                 </div>
 
                 <!--Title-->
@@ -58,7 +55,18 @@
                 <!--Rating-->
                 <div class="form-group">
                     <label for="ratingSubmit">Rating</label>
-                    <input type="text" class="form-control col-4" id="ratingSubmit" name="ratingSubmit">
+                    <select class="form-control col-2" id="ratingSubmit" name="ratingSubmit">
+                        <option>...</option>
+                        <option>G</option>
+                        <option>G-TV</option>
+                        <option>PG</option>
+                        <option>PG-TV</option>
+                        <option>R-13</option>
+                        <option>SPG</option>
+                        <option>R-16</option>
+                        <option>R-18</option>
+                        <option>X</option>
+                    </select>
                 </div>
                 <div id="ratingAlert" role="alert">
                 </div>

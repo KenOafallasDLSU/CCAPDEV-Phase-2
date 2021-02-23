@@ -18,15 +18,15 @@ $(document).ready(function() {
                 $("#".concat(item.seatNum)).attr("disabled", true);
             }
         });
+
+        if($("input[type=checkbox]:disabled").length == 100)
+        {
+            $("#noSeatAlert").html("SOLD OUT! There are no more available seats.");
+            $("#noSeatAlert").addClass("alert alert-danger col-12");
+
+            $("#seatSubmit").attr("disabled", true);
+        }
     });
-
-    if($("input[type=checkbox]:disabled").length == 100)
-    {
-        $("#noSeatAlert").html("SOLD OUT! There are no more available seats.");
-        $("#noSeatAlert").addClass("alert alert-danger col-12");
-
-        $("#seatSubmit").attr("disabled", true);
-    }
 
     $("input[type=checkbox]:not(:checked)").click(function(){
         $("#noSeatAlert").html("");

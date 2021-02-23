@@ -40,7 +40,7 @@ function descError(){
 
 //Rating
 function ratingError(){
-    if($("#ratingSubmit").val()==""){
+    if($("#ratingSubmit").val()=="..."){
         $("#ratingSubmit").css("border", "1px solid #B00000");
 
         $("#ratingAlert").text("Rating field is required!");
@@ -106,21 +106,40 @@ function time3Error(){
     }
 }
 
+//clear input
+const clearInput = () => {
+    //console.log("Clearing input...")
+    $("#screenNumberSubmit").val("")
+    $("#dateSubmit").val("")
+    $("#titleSubmit").val("")
+    $("#descSubmit").val("")
+    $("#posterSubmit").val("")
+    $("#durationSubmit").val("")
+    $("#priceSubmit").val("")
+    $("#timeStartSubmit1").val("")
+    $("#timeEndSubmit1").val("")
+    $("#timeStartSubmit2").val("") 
+    $("#timeEndSubmit2").val("")
+    $("#timeStartSubmit3").val("")
+    $("#timeEndSubmit3").val("")
+    $("#ratingSubmit").val("")
+}
+
 //submit validation
 function checkEmployeeForm() {
-    var v1 = !($("#screenNumberSubmit").val()=="...");
-    var v2 = !($("#dateSubmit").val()=="");
-    var v3 = !($("#titleSubmit").val()=="");
-    var v4 = !($("#descSubmit").val()=="");
-    var v5 = !($("#posterSubmit").val()=="");
-    var v6 = !($("#durationSubmit").val()=="");
-    var v7 = !($("#priceSubmit").val()=="");
-    var v8 = !($("#timeStartSubmit1").val()=="" || $("#timeEndSubmit1").val()=="");
-    var v9 = !($("#timeStartSubmit2").val()=="" || $("#timeEndSubmit2").val()=="");
-    var v10 = !($("#timeStartSubmit3").val()=="" || $("#timeEndSubmit3").val()=="");
-    var v11 = !($("#ratingSubmit").val()=="");
+    const v1 = !($("#screenNumberSubmit").val()=="...");
+    const v2 = !($("#dateSubmit").val()=="");
+    const v3 = !($("#titleSubmit").val()=="");
+    const v4 = !($("#descSubmit").val()=="");
+    const v5 = !($("#posterSubmit").val()=="");
+    const v6 = !($("#durationSubmit").val()=="");
+    const v7 = !($("#priceSubmit").val()=="");
+    const v8 = !($("#timeStartSubmit1").val()=="" || $("#timeEndSubmit1").val()=="");
+    const v9 = !($("#timeStartSubmit2").val()=="" || $("#timeEndSubmit2").val()=="");
+    const v10 = !($("#timeStartSubmit3").val()=="" || $("#timeEndSubmit3").val()=="");
+    const v11 = !($("#ratingSubmit").val()=="");
 
-    var valid = v1 && v2 && v3 && v4 && v5 && v6 && v7 && v8 && v9 && v10 && v11;
+    const valid = v1 && v2 && v3 && v4 && v5 && v6 && v7 && v8 && v9 && v10 && v11;
 /*
     if(valid == true)
         alert("Screen Movie Information Successfully Updated");
@@ -130,9 +149,9 @@ function checkEmployeeForm() {
 
 $(document).ready(function() {
     //Screen Number
-    $("#screenNumberSubmit").focusin(function(){
-        screenNumberError();
-    });
+    // $("#screenNumberSubmit").focusin(function(){
+    //     screenNumberError();
+    // });
 
     $("#screenNumberSubmit").focusout(function(){
         if($("#screenNumberSubmit").val()!="..."){
@@ -147,9 +166,9 @@ $(document).ready(function() {
     });
 
     //Date
-    $("#dateSubmit").focusin(function(){
-        dateError();
-    });
+    // $("#dateSubmit").focusin(function(){
+    //     dateError();
+    // });
 
     $("#dateSubmit").focusout(function(){
         if($("#dateSubmit").val()!=""){
@@ -164,9 +183,9 @@ $(document).ready(function() {
     });
 
     //title
-    $("#titleSubmit").focusin(function(){
-        titleError();
-    });
+    // $("#titleSubmit").focusin(function(){
+    //     titleError();
+    // });
 
     $("#titleSubmit").focusout(function(){
         if($("#titleSubmit").val()!=""){
@@ -181,9 +200,9 @@ $(document).ready(function() {
     });
 
     //desc
-    $("#descSubmit").focusin(function(){
-        descError();
-    });
+    // $("#descSubmit").focusin(function(){
+    //     descError();
+    // });
 
     $("#descSubmit").focusout(function(){
         if($("#descSubmit").val()!=""){
@@ -198,12 +217,12 @@ $(document).ready(function() {
     });
 
     //rating
-    $("#ratingSubmit").focusin(function(){
-        ratingError();
-    });
+    // $("#ratingSubmit").focusin(function(){
+    //     ratingError();
+    // });
 
     $("#ratingSubmit").focusout(function(){
-        if($("#ratingSubmit").val()!=""){
+        if($("#ratingSubmit").val()!="..."){
             $("#ratingSubmit").css("border", "1px solid #ddd");
 
             $("#ratingAlert").html("");
@@ -215,9 +234,9 @@ $(document).ready(function() {
     });
 
     //Poster
-    $("#posterSubmit").focusin(function(){
-        posterError();
-    });
+    // $("#posterSubmit").focusin(function(){
+    //     posterError();
+    // });
 
     $("#posterSubmit").focusout(function(){
         if($("#posterSubmit").val()!=""){
@@ -230,9 +249,9 @@ $(document).ready(function() {
     });
 
     //duration
-    $("#durationSubmit").focusin(function(){
-        durationError();
-    });
+    // $("#durationSubmit").focusin(function(){
+    //     durationError();
+    // });
 
     $("#durationSubmit").focusout(function(){
         if($("#durationSubmit").val()!=""){
@@ -247,9 +266,9 @@ $(document).ready(function() {
     });
 
     //price
-    $("#priceSubmit").focusin(function(){
-        priceError();
-    });
+    // $("#priceSubmit").focusin(function(){
+    //     priceError();
+    // });
 
     $("#priceSubmit").focusout(function(){
         if($("#priceSubmit").val()!=""){
@@ -264,9 +283,9 @@ $(document).ready(function() {
     });
 
     //Time1
-    $("#timeStartSubmit1, #timeEndSubmit1").focusin(function(){
-        time1Error();
-    });
+    // $("#timeStartSubmit1, #timeEndSubmit1").focusin(function(){
+    //     time1Error();
+    // });
 
     $("#timeStartSubmit1, #timeEndSubmit1").focusout(function(){
         if($("#timeStartSubmit1").val()!="" && $("#timeEndSubmit1").val()!=""){
@@ -281,9 +300,9 @@ $(document).ready(function() {
     });
 
     //Time2
-    $("#timeStartSubmit2, #timeEndSubmit2").focusin(function(){
-        time2Error();
-    });
+    // $("#timeStartSubmit2, #timeEndSubmit2").focusin(function(){
+    //     time2Error();
+    // });
 
     $("#timeStartSubmit2, #timeEndSubmit2").focusout(function(){
         if($("#timeStartSubmit2").val()!="" && $("#timeEndSubmit2").val()!=""){
@@ -298,12 +317,12 @@ $(document).ready(function() {
     });
 
     //Time3
-    $("#timeStartSubmit3, #timeEndSubmit3").focusin(function(){
-        time3Error();
-    });
+    // $("#timeStartSubmit3, #timeEndSubmit3").focusin(function(){
+    //     time3Error();
+    // });
 
     $("#timeStartSubmit3, #timeEndSubmit3").focusout(function(){
-        if($("#timeStartSubmit3").val()!="" && $("#timeEndSubmit1").val()!=""){
+        if($("#timeStartSubmit3").val()!="" && $("#timeEndSubmit3").val()!=""){
             $("#timeStartSubmit3, #timeEndSubmit3").css("border", "1px solid #ddd");
 
             $("#time3Alert").html("");
@@ -314,7 +333,9 @@ $(document).ready(function() {
         }
     });
 
-    $("#employeeSubmit").click(function(){
+    $("#employeeSubmit").click(function(event){
+        event.preventDefault();
+
         screenNumberError();
         dateError();
         titleError();
@@ -327,10 +348,8 @@ $(document).ready(function() {
         time3Error();
         ratingError();
 
-        
-        var freeScreen = false;
-
         /*
+        let freeScreen = false;
         if(checkEmployeeForm() == true)
         { 
             //Convert date string to Date object 
@@ -385,17 +404,11 @@ $(document).ready(function() {
             }
 
             alert("Screen Movie Information Successfully Updated");
+            clearInput()
 
             $.post("addScreening", screeningInfo, function(data, status) {
-                if(data.success) {
-                    alert("Screen Movie Information Successfully Updated");
-                } else {
-                    alert("Screen Movie Information Not Successfully Updated");
-                }
+            
             });
-
-        } else {
-            alert("Screen Movie Information Too Full");
-        }       
+        }
     });
 });
