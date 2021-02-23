@@ -54,6 +54,10 @@ exports.getUserTransactions = (user,sort, next) => {
     })
 }
 
+exports.getUserTransactionsAsync = (user,sort) => {
+    return transactionModel.find({client: user}).sort(sort).exec()
+}
+
 exports.create = (object,next) => {
     const newTransaction = new transactionModel(object)
     newTransaction.save((err,transaction) => {

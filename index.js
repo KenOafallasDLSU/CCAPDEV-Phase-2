@@ -44,6 +44,7 @@ const crypto = require("crypto");
 const multer = require("multer");
 const GridFsStorage = require("multer-gridfs-storage");
 const Grid = require('gridfs-stream');
+const { resolve } = require('path');
 
 // init gfs
 let gfs;
@@ -457,64 +458,49 @@ app.post('/cancelSeats',function(req,res) {
 })
 /* transaction history page */
 
-app.get('/transactions',function(req,res) {
-  var user
-  var today = new Date(2020, 4, 9);
-  var sort = {date: 1}
+app.get('/transactions', async (req,res) => {
+  let user
+  const today = new Date(2020, 5, 8);
+  const sort = {date: 1}
   if (req.session.fullname != null)
     user = req.session.user
   else
     user = false
-  if (user){
-    userModel.getOne({_id:user}, (err,client) => {
-      if (err) {
-        console.log("error")
-        throw err
-      }
-      if (client) {
-        var transArray =[]
-        var transObj = {};
-        transactionModel.getUserTransactions(client, sort,(err, transactions) => {
-          if (err) throw err
-          if (transactions) {
-            setTimeout(function(){
-              res.render('BigBrain_TransactionHistory', {
-                user: client.full_name,
-                pageCSS: "BigBrain_TransactionHistory",
-                pageTitle: "Transaction History",
-                header: "header",
-                footer: "footer",
-                transactions: transArray
-              })
-            },1000)
-            transactions.forEach(element =>{
-              screeningModel.getOne({_id:element.screening},(err,movie) => {
-                if (err) throw err
-                if (movie) {
-                  transObj['title'] = movie.title
-                  transObj['date'] = movie.datetxt
-                  transObj['seats'] = element.seats
-                  if (element.date > today)
-                    transObj['status'] = 'Completed' /* placeholder */
-                  else
-                    transObj['status'] = 'Reserved'
-                  slotModel.getMovie({_id:element.slot},(err,result) => {
-                    if(err) throw err
-                    if (result) {
-                      transObj['start'] = result.slotStart
-                      transObj['end'] = result.slotEnd
-                      transArray.push(transObj)
-                      console.log(transArray)
-                    }
-                  })
-                }
-              })
-            })
-          }
+
+  let getSingleTrans = element => {
+    return new Promise(async (resolve, reject) => {
+      const movie = await screeningModel.getOneAsync({_id:element.screening})
+      const result = await slotModel.getOne({_id:element.slot})
+      if (movie && result) {
+        resolve({
+          title: movie.title,
+          date: movie.datetxt,
+          seats: element.seats,
+          status: element.date < today ? 'Completed' : 'Reserved',
+          start: result.slotStart,
+          end: result.slotEnd
         })
+        //console.log(transArray)
       }
     })
   }
+
+  const transactions = await transactionModel.getUserTransactionsAsync(ObjectId(user), sort)
+  let getAllTrans = await Promise.all(
+    transactions.map(async element => {
+      let trans = await getSingleTrans(element)
+      return trans
+    })
+  )
+
+  res.render('BigBrain_TransactionHistory', {
+    user: req.session.fullname,
+    pageCSS: "BigBrain_TransactionHistory",
+    pageTitle: "Transaction History",
+    header: "header",
+    footer: "footer",
+    transactions: getAllTrans
+  })
 })
 
 /* Screenings Page */

@@ -69,3 +69,7 @@ exports.getOne = (query, next) => {
         next(err, screening);
     });
 };
+
+exports.getOneAsync = (query) => {
+  return screeningModel.findOne(query).exec()
+};

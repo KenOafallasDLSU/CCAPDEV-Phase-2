@@ -23,7 +23,7 @@ $(document).ready(function () {
         $("#credAlert").html("");
         $("#credAlert").removeClass("alert alert-danger col-12");
         if (checkCreditCardNum()) {
-            window.location = '/movies';
+            window.location = '/transactions';
         }
     })
     $('#cancel').click(function(){
