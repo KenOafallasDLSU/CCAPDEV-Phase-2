@@ -403,7 +403,8 @@ $(document).ready(function() {
                 rating: rating
             }
 
-            alert("Screen Movie Information Successfully Updated");
+            //alert("Screen Movie Information Successfully Updated");
+            $('#completeModal').modal({show: true})
             clearInput()
 
             $.post("addScreening", screeningInfo, function(data, status) {
