@@ -373,17 +373,22 @@ app.get('/checkout', function (req,res) {
   var username
   var today = new Date(2020, 4, 9);
   var sort = {seatNum: 1}
+  var slotp;
+  console.log(req.session)
   if (req.session.fullname != null) {
     user = req.session.user
     username = req.session.fullname
   }
   else
     user = false
+  if (req.session.slot != null) {
+    slotp = req.session.slot;
+  }
   if (user) {
     userModel.getOne({_id:user},(err,client) => {
       if (err) throw err
       if (client) {
-        seatModel.getUserSeats(client,sort,(err,seats) => {
+        seatModel.getUserSeats(client,slotp,sort,(err,seats)=> {
           if (err) throw err
           if (seats) {
             var seatArray =[];
@@ -391,10 +396,10 @@ app.get('/checkout', function (req,res) {
             seats.forEach(item => {
               var seatObj = {};
               seatObj['seatNum'] = item.seatNum
+              seatObj['id'] = item._id
               seatArray.push(seatObj)
-              mov = item.slot
             })
-            slotModel.getMovie({_id:mov},(err,slot) => {
+            slotModel.getMovie({_id:slotp},(err,slot)=> {
               if (err) throw err
               console.log(slot)
               if (slot){
@@ -428,6 +433,28 @@ app.get('/checkout', function (req,res) {
   }
 })
 
+app.post('/cancelSeats',function(req,res) {
+  console.log(req.session)
+  var user;
+  var slotp;
+  if (req.session.fullname != null)
+    user = req.session.user
+  else
+    user = false
+  if (req.session.slot != null)
+    slotp = req.session.slot
+  if (user){
+    userModel.getOne({_id:user}, (err,client) => {
+      if (err) throw err
+      if (client) {
+        seatModel.reserveSeats({status:'R',slot:slotp,owner: client},{$set: {status: "A", owner: ObjectId('nilnilnilnil')}},(err,result) => {
+          if (err) throw err
+          res.send(result)
+        })
+      }
+    })
+  }
+})
 /* transaction history page */
 
 app.get('/transactions',function(req,res) {

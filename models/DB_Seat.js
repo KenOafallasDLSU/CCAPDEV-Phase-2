@@ -18,9 +18,9 @@ const SeatSchema = new mongoose.Schema(
 
 const seatsModel = mongoose.model('Seats',SeatSchema)
 
-exports.getUserSeats = (user,sort,next) => {
+exports.getUserSeats = (user,slot,sort,next) => {
     var objArr = []
-    seatsModel.find({owner: user}).sort(sort).exec((err,seats) => {
+    seatsModel.find({owner: user,slot:slot}).sort(sort).exec((err,seats) => {
         seats.forEach(item => {
             if (item.status == 'R')
             objArr.push(item)
