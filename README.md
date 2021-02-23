@@ -13,6 +13,7 @@ Phase 2 implements the following features:
 - basic user authentication, access control and session data
 
 Limitations:
+- database was populated manually and artificially
 - business logic not fully implemented i.e. checkout and add screening do not update database yet
 - local build only
 - MVC not fully implemented
