@@ -33,11 +33,11 @@ npm start
 ### Step 3: Access local instance on localhost:3000
 ### Step 4.a: Log in to customer services using
 ```
-username:
-password:
+username: customer@test.com
+password: p@ssword
 ```
 ### Step 4.b: Log in to employee services using
 ```
-username:
-password:
+username: employee@test.com
+password: p@ssword
 ```
