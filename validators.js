@@ -15,4 +15,8 @@ const userLoginValidation = [
   body('passlog').not().isEmpty().withMessage("Password is required.")
 ];
 
+const checkoutValidation = [
+  body('cardno').isLength({ min: 16, max: 16 }).withMessage("Credit Card number should be 16 digits in length.").isInt().withMessage("Contact number should only be composed of numbers."),
+]
+
 module.exports = { userRegisterValidation, userLoginValidation };

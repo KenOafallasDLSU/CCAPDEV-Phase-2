@@ -57,8 +57,12 @@ html {
     background-color: #3E6F71;
     border-color: #3E6F71;
 }
+#cancel{
+    background-color: #3E6F71;
+    border-color: #3E6F71;
+}
 
 #poster {
-    max-height: 60vh;
-    min-height: 200px;
+    height: 450px;
+    width: 320px;
   }
