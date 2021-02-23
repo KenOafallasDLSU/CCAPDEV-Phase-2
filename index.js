@@ -235,7 +235,7 @@ app.post('/seatSelection/getSeatStatus', isCustomer, function(req, res) {
 app.post("/seatSelection/reserveSeats", isCustomer, function(req, res) {
   seatModel.reserveSeats({slot: ObjectId(req.session.slot), seatNum: {$in: req.body.reservedSeats}}, {$set: {status: "R", owner: ObjectId(req.session.user)}}, function(err, result) {
     if (err) throw err;
-    res.redirect('/checkout');
+    res.send(result);
   });
 });
 
@@ -244,8 +244,8 @@ app.post("/seatSelection/reserveSeats", isCustomer, function(req, res) {
  */
 app.get("/seatSelection/:slotid", isCustomer, async (req, res) => {
   req.session.slot = req.params.slotid
-  let currSlotId = req.session.slot
-  let slot = await slotModel.getOne({"_id": ObjectId(currSlotId)})
+  let slot = await slotModel.getOne({"_id": ObjectId(req.params.slotid)})
+  console.log(slot)
 
   screeningModel.getOne({"_id": slot.screening}, function(err, result) {
     if(err) throw err;
