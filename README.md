@@ -13,7 +13,7 @@ Phase 2 implements the following features:
 - basic user authentication, access control and session data
 
 Limitations:
-- database was populated manually and artificially
+- database was populated manually and artificially, not checked for logic
 - business logic not fully implemented i.e. checkout and add screening do not update database yet
 - local build only
 - MVC not fully implemented
@@ -36,6 +36,11 @@ npm start
 username: customer@test.com
 password: p@ssword
 ```
+
+For sample screening slot with a few unavailable seats, enter Screen 1 "The Room" Slot 1
+
+For sample screening slot that is sold out, enter Screen 1 "The Room" Slot 2
+
 ### Step 4.b: Log in to employee services using
 ```
 username: employee@test.com
