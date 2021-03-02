@@ -14,7 +14,7 @@ const MongoStore = require('connect-mongo')(session);
 const {envPort, dbURL, sessionKey} = require('./config');
 const methodOverride = require('method-override');
 const {allowInsecurePrototypeAccess} = require('@handlebars/allow-prototype-access');
-const {isCustomer, isEmp} = require('./middlewares/checkRoutes.js')
+const {isCustomer, isEmp} = require('./middlewares/checkRoutes.js');
 
 
 //creates express app
@@ -294,7 +294,7 @@ app.get("/employeeFacing", isEmp, function(req, res) {
 
 
 /* checkout page */
-app.get('/checkout', function (req,res) {
+app.get('/checkout', isCustomer, function (req,res) {
   var user
   var username
   var today = new Date(2020, 4, 9);
@@ -383,7 +383,7 @@ app.post('/cancelSeats',function(req,res) {
 })
 /* transaction history page */
 
-app.get('/transactions', async (req,res) => {
+app.get('/transactions', isCustomer, async (req,res) => {
   let user
   const today = new Date(2020, 5, 8);
   const sort = {date: 1}
