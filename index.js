@@ -14,7 +14,7 @@ const MongoStore = require('connect-mongo')(session);
 const {envPort, dbURL, sessionKey} = require('./config');
 const methodOverride = require('method-override');
 const {allowInsecurePrototypeAccess} = require('@handlebars/allow-prototype-access');
-const {isCustomer, isEmp} = require('./middlewares/checkRoutes.js')
+const {isCustomer, isEmp} = require('./middlewares/checkRoutes.js');
 
 
 //creates express app
@@ -34,9 +34,7 @@ const seatModel = require('./models/DB_Seat');
 const transactionModel = require('./models/DB_Transaction');
 
 //others
-const bcrypt = require('bcrypt');
 const {validationResult} = require('express-validator');
-const {userRegisterValidation, userLoginValidation} = require('./validators.js');
 const options = { useUnifiedTopology: true };
 
 /*************Multer File Uploads */
@@ -144,6 +142,15 @@ app.use((req, res, next) => {
   res.locals.error_msg = req.flash('error_msg');
   next();
 });
+
+// initialize routes
+const userRouter = require('./routes/userRoutes');
+const screeningRouter = require('./routes/screeningRoutes');
+const { mongo } = require('./models/connection');
+
+// use routes
+app.use('/', userRouter);
+app.use('/', screeningRouter);
 
 app.post("/addScreening", function(req, res) {
 //   const screening = new screeningModel({
@@ -285,91 +292,9 @@ app.get("/employeeFacing", isEmp, function(req, res) {
   });
 });
 
-/* Login Page */
-app.get('/', function(req, res) {
-    res.render('login', {
-      layout: 'home',
-      img: 'img/brain.png',
-    });
-});
-
-//login posts
-app.post('/user-register', userRegisterValidation, (req, res) => {
-  const errors = validationResult(req);
-  if(errors.isEmpty()) {
-    const {fname, lname, emailreg, passreg, typeuser} = req.body;
-    userModel.getOne({email: emailreg}, (err, result) => {
-      if(result) {
-        req.flash('error_msg', 'User already exists. Please login.');
-        res.redirect('/');
-      } else {
-        const saltRounds = 10;
-        bcrypt.hash(passreg, saltRounds, (err, hashed) => {
-          const newUser = {
-            first_name: fname,
-            family_name: lname,
-            email: emailreg,
-            password: hashed,
-            usertype: typeuser
-          };
-          userModel.create(newUser, (err, user) => {
-            if(err) {
-              req.flash('error_msg', 'Error creating new account. Please try again.');
-              res.redirect('/');
-            } else {
-              req.flash('success_msg', 'Registration successful! Please login.');
-              res.redirect('/');
-            }
-          });
-        });
-      }
-    });
-  } else {
-    const messages = errors.array().map((item) => item.msg);
-    req.flash('error_msg', messages.join(' '));
-    res.redirect('/');
-  }
-});
-
-app.post('/user-login', userLoginValidation, (req, res) => {
-  const errors = validationResult(req);
-  if(errors.isEmpty()) {
-    const {emaillog, passlog} = req.body;
-    userModel.getOne({email: emaillog}, (err, user) => {
-      if(err) {
-        console.log(err); //testing
-        res.redirect('/login');
-      } else {
-        if(user) {
-          bcrypt.compare(passlog, user.password, (err, result) => {
-            if (result) {
-              req.session.user = user._id;
-              req.session.fullname = user.full_name;
-              req.session.type = user.usertype;
-              if (user.usertype == 'C')
-                res.redirect('/movies');
-              else
-                res.redirect('/employeeFacing')
-            } else {
-              req.flash('error_msg', 'Incorrect password. Please try again.');
-              res.redirect('/');
-            }
-          });
-        } else {
-          req.flash('error_msg', 'User not found. Please try again.');
-          res.redirect('/');
-        }
-      }
-    });
-  } else {
-    const messages = errors.array().map((item) => item.msg);
-    req.flash('error_msg', messages.join(' '));
-    res.redirect('/');
-  }
-});
 
 /* checkout page */
-app.get('/checkout', function (req,res) {
+app.get('/checkout', isCustomer, function (req,res) {
   var user
   var username
   var today = new Date(2020, 4, 9);
@@ -502,84 +427,6 @@ app.get('/transactions', async (req,res) => {
     transactions: getAllTrans
   })
 })
-
-/* Screenings Page */
-app.get('/movies', function(req, res) {
-    var today = new Date(2020, 4, 9); //hardcoded dates
-    var tom = new Date(2020, 4, 10);
-    var next = new Date(2020, 4, 11);
-    var screens1 = [];
-    var screens2 = [];
-    var screens3 = [];
-    var username;
-
-      screeningModel.forMovies({date: today}, (err, result) => {
-          result.forEach(function(doc) {
-          screens1.push(doc);
-        });
-        console.log(screens1[0].slots);
-        screeningModel.forMovies({date: tom}, (err, result) => {
-            result.forEach(function(doc) {
-            screens2.push(doc);
-          });
-          screeningModel.forMovies({date: next}, (err, result) => {
-              result.forEach(function(doc) {
-              screens3.push(doc);
-          });
-
-          if (req.session.fullname != null && req.session.type == 'C')
-            username= req.session.fullname;
-          else
-            username= "guest";
-
-            console.log(req.session);
-
-            res.render('movies', {
-              user: username,
-              pageCSS: "BigBrain_Screenings",
-              pageJS: "BigBrain_Screenings",
-              pageTitle: "Movie Screenings",
-              header: "header",
-              footer: "footer",
-              day1: screens1,
-              day2: screens2,
-              day3: screens3,
-              date1: today.toDateString(),
-              date2: tom.toDateString(),
-              date3: next.toDateString()
-            });
-        });
-      });
-    });
-});
-
-//screening posts
-app.post('/searchScreening', function(req, res) {
-  screeningModel.find({date: req.body.date}, function(err, screenings){
-    var result = {cont: screenings, empty: true};
-    if (err)
-      console.log('There is an error when searching for a screenings.');
-    console.log("Screenings: " + screenings);
-    if(screenings == null)
-      result.empty = true;
-    else
-      result.empty = false;
-    console.log("Result: " + result.empty);
-    res.send(result);
-  });
-});
-
-/*Header*/
-//for user logout
-app.get('/logout', (req, res) => {
-  if(req.session){
-    console.log(req.session);
-    req.session.destroy(() => {
-      res.clearCookie('connect.sid');
-      res.redirect('/');
-    });
-  };
-});
 
 app.listen(port, function() {
   console.log('App listening at port ' + port);
