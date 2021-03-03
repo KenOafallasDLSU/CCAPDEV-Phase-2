@@ -383,7 +383,7 @@ app.post('/cancelSeats',function(req,res) {
 })
 /* transaction history page */
 
-app.get('/transactions', isCustomer, async (req,res) => {
+app.get('/transactions', async (req,res) => {
   let user
   const today = new Date(2020, 5, 8);
   const sort = {date: 1}
