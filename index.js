@@ -5,7 +5,6 @@ const path = require('path');
 const exphbs = require('express-handlebars');
 const _handlebars = require('handlebars');
 const bodyParser = require('body-parser');
-const mongodb = require('mongodb');
 const mongoose = require('./models/connection');
 const session = require('express-session');
 const flash = require('connect-flash');
@@ -33,9 +32,42 @@ const slotModel = require('./models/DB_Slot');
 const seatModel = require('./models/DB_Seat');
 const transactionModel = require('./models/DB_Transaction');
 
-//others
-const {validationResult} = require('express-validator');
-const options = { useUnifiedTopology: true };
+//create engine
+app.engine('hbs', exphbs({
+    extname: 'hbs',
+    defaultView: 'main',
+    layoutsDir: path.join(__dirname, '/views/layouts'),
+    partialsDir: path.join(__dirname, '/views/partials'),
+    handlebars: allowInsecurePrototypeAccess(_handlebars)
+}));
+
+app.set('view engine', 'hbs');
+
+//middleware
+app.use('/static', express.static(path.join(__dirname, 'public')))
+app.use(express.static('public'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(methodOverride("_method"));
+
+// sessions - server configuration
+app.use(session({
+  secret: sessionKey,
+  store: new MongoStore({mongooseConnection: mongoose.connection}),
+  resave: false,
+  saveUninitialized: true.valueOf,
+  cookie: {secure: false, maxAge: 1000 * 60 * 60 * 24 * 7}
+}));
+
+// flash
+app.use(flash());
+
+// global variable messages
+app.use((req, res, next) => {
+  res.locals.success_msg = req.flash('success_msg');
+  res.locals.error_msg = req.flash('error_msg');
+  next();
+});
 
 /*************Multer File Uploads */
 const crypto = require("crypto");
@@ -106,192 +138,15 @@ app.get('/:prefix?/image/:filename', (req, res) => {
 });
 /******************************** */
 
-//create engine
-app.engine('hbs', exphbs({
-    extname: 'hbs',
-    defaultView: 'main',
-    layoutsDir: path.join(__dirname, '/views/layouts'),
-    partialsDir: path.join(__dirname, '/views/partials'),
-    handlebars: allowInsecurePrototypeAccess(_handlebars)
-}));
-
-app.set('view engine', 'hbs');
-
-//middleware
-app.use('/static', express.static(path.join(__dirname, 'public')))
-app.use(express.static('public'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(methodOverride("_method"));
-
-// sessions - server configuration
-app.use(session({
-  secret: sessionKey,
-  store: new MongoStore({mongooseConnection: mongoose.connection}),
-  resave: false,
-  saveUninitialized: true.valueOf,
-  cookie: {secure: false, maxAge: 1000 * 60 * 60 * 24 * 7}
-}));
-
-// flash
-app.use(flash());
-
-// global variable messages
-app.use((req, res, next) => {
-  res.locals.success_msg = req.flash('success_msg');
-  res.locals.error_msg = req.flash('error_msg');
-  next();
-});
-
 // initialize routes
 const userRouter = require('./routes/userRoutes');
 const screeningRouter = require('./routes/screeningRoutes');
-const { mongo } = require('./models/connection');
+const seatRouter = require('./routes/seatRoutes')
 
 // use routes
 app.use('/', userRouter);
 app.use('/', screeningRouter);
-
-app.post("/addScreening", function(req, res) {
-//   const screening = new screeningModel({
-//     date: req.body.date,
-//     screenNum: req.body.screenNum,
-//     title: req.body.title,
-//     posterUrl: req.body.poster,
-//     desc: req.body.desc,
-//     rating: req.body.rating,
-//     duration: req.body.duration,
-//     price: req.body.price,
-//     time1: req.body.time1start,
-//     time2: req.body.time2start,
-//     time3: req.body.time3start
-//   });
-
-//   screeningModel.insertOne(screening, function(err, res1) {
-//     if (err) throw err;
-//     const screeningId = res1.ops[0]
-
-//     const slot1 = new slotModel({
-//       screening: screeningId,
-//       slotOrder: 1,
-//       slotStart: req.body.time1start,
-//       slotEnd: req.body.time1end
-//     });
-//     const slot2 = new slotModel({
-//       screening: screeningId,
-//       slotOrder: 2,
-//       slotStart: req.body.time2start,
-//       slotEnd: req.body.time2end
-//     });
-//     const slot3 = new slotModel({
-//       screening: screeningId,
-//       slotOrder: 3,
-//       slotStart: req.body.time3start,
-//       slotEnd: req.body.time3end
-//     });
-
-//     dbo.collection("slots").insertMany([slot1, slot2, slot3], function(err, res2) {
-//       if (err) throw err;
-
-//       console.log(res2)
-
-//       let aSeats = [];
-//       let letter = 'A';
-//       let number = 1;
-
-//       for(let slotNum = 0; slotNum < 3; slotNum++){
-//         letter = 'A';
-//         number = 1;
-
-//         for(let i = 0; i < 10; i++){
-//           for(let j = 0; j < 10; j++){
-//             const tempSeat = seatModel({
-//               seatNum: String.fromCharCode(letter.charCodeAt() + i).concat(number + j),
-//               status: "A",
-//               slot: result2[slotNum]._id
-//             });
-
-//             aSeats.push(tempSeat);
-//           }
-//         }
-//       }
-
-//       dbo.collection("seats").insertMany(aSeats, function(err, res3) {
-//         if (err) throw err;
-//         //console.log("300 seats inserted");
-//       });
-//     });
-//   });
-});
-
-/**
- * POST route
- * get statis of seats, whether A,R,U
- */
-app.post('/seatSelection/getSeatStatus', isCustomer, function(req, res) {
-  //console.log("Status of " + req.session.slot)
-  seatModel.getSeatsOfSlot(ObjectId(req.session.slot), (err, result) => {
-    if(err) throw err;
-    res.send(result);
-  })
-});
-
-/**
- * POST route
- * updates seats selected to Reserved then redirects to checkout
- */
-app.post("/seatSelection/reserveSeats", isCustomer, function(req, res) {
-  seatModel.reserveSeats({slot: ObjectId(req.session.slot), seatNum: {$in: req.body.reservedSeats}}, {$set: {status: "R", owner: ObjectId(req.session.user)}}, function(err, result) {
-    if (err) throw err;
-    res.send(result);
-  });
-});
-
-/**
- * Render seatSelection page
- */
-app.get("/seatSelection/:slotid", isCustomer, async (req, res) => {
-  req.session.slot = req.params.slotid
-  let slot = await slotModel.getOne({"_id": ObjectId(req.params.slotid)})
-  console.log(slot)
-
-  screeningModel.getOne({"_id": slot.screening}, function(err, result) {
-    if(err) throw err;
-    var screening = result;
-
-    res.render("BigBrain_Seats", {
-      //header
-      user: req.session.fullname,
-
-      //main head
-      pageCSS: "BigBrain_Seats",
-      pageJS: "BigBrain_Seats",
-      pageTitle: "Seat Selection",
-      header: "header",
-      footer: "footer",
-
-      //body
-      screening: screening,
-      slot: slot,
-      dateFormatted: screening.date.toDateString()
-    });
-  });
-});
-
-app.get("/employeeFacing", isEmp, function(req, res) {
-  res.render("BigBrain_EmployeeFacing", {
-    //header
-    user: req.session.fullname,
-
-    //head
-    pageCSS: "BigBrain_EmployeeFacing",
-    pageJS: "BigBrain_EmployeeFacing",
-    pageTitle: "Add Screening",
-    header: "BigBrain_EmployeeHeader",
-    footer: "BigBrain_EmployeeFooter"
-  });
-});
-
+app.use('/seatSelection', seatRouter);
 
 /* checkout page */
 app.get('/checkout', isCustomer, function (req,res) {
