@@ -33,7 +33,7 @@ $(document).ready(function () {
 
 
             //console.log(reservedSeats)
-        $.post("/cancelSeats", function(req, res) {
+        $.post("/transactions/cancelSeats", function(req, res) {
         })
         window.location = '/movies';
     })
