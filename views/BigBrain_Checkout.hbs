@@ -33,14 +33,15 @@
                 <strong>Total Cost:</strong><br>
                 PHP {{cost}}
             </div>
-            <div>
-                <strong>Credit Card:</strong>
-                <input id = 'cardnum' name = 'cardnum' type = 'tel' inputmode='numeric' autocomplete = 'cc-number' maxlength = '16' placeholder = 'xxxxxxxxxxxxxxxx' class = 'form-control'>
-            </div>
-                <div id="credAlert" role="alert"></div>
-            <div>
-                <button class = 'btn btn-primary' id = 'checkout'>Submit</button> <button class = 'btn btn-primary' id = 'cancel'>Cancel</button>
-            </div>
+                <div>
+                    {{>messages}}
+                    <strong>Credit Card:</strong>
+                    <input id = 'cardnum' name = 'cardnum' type = 'tel' inputmode='numeric' autocomplete = 'cc-number' maxlength = '16' placeholder = 'xxxxxxxxxxxxxxxx' class = 'form-control'>
+                </div>
+                    <div id="credAlert" role="alert"></div>
+                <div>
+                    <button class = 'btn btn-primary' id = 'checkout'>Submit</button> <button class = 'btn btn-primary' id = 'cancel'>Cancel</button>
+                </div>
         </div>
     </div>
 </div>

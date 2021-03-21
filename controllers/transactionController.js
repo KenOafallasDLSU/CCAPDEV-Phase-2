@@ -16,7 +16,7 @@ exports.getCheckout = (req,res) => {
     var today = new Date(2020, 4, 9);
     var sort = {seatNum: 1}
     var slotp;
-    console.log(req.session)
+    req.session.seatString = ""
     if (req.session.fullname != null) {
       user = req.session.user
       username = req.session.fullname
@@ -35,11 +35,14 @@ exports.getCheckout = (req,res) => {
             if (seats) {
               var seatArray =[];
               var mov = {};
+              var seatString = "";
               seats.forEach(item => {
                 var seatObj = {};
                 seatObj['seatNum'] = item.seatNum
                 seatObj['id'] = item._id
                 seatArray.push(seatObj)
+                seatString = seatString+item.seatNum + " "
+                req.session.seatString = seatString;
               })
               slotModel.getMovie({_id:slotp},(err,slot)=> {
                 if (err) throw err
@@ -49,7 +52,6 @@ exports.getCheckout = (req,res) => {
                     if (err) throw err
                     if (screening) {
                       var totalPrice = screening.price * seatArray.length
-                      console.log(seatArray)
                       res.render('BigBrain_Checkout', {
                         user: username,
                         pageCSS: "BigBrain_Checkout",
@@ -74,9 +76,54 @@ exports.getCheckout = (req,res) => {
       })
     }
   }
+
+exports.createTransaction = (req,res) => {
+  var slotp
+  var user;
+  var date = new Date()
+  console.log(date)
+  var cardnum;
+  var sort = {seatNum:1}
+  var seatString;
+  if (req.session.fullname != null) {
+    user = req.session.user
+  }
+  else user = false
+  if (req.session.slot != null && req.session.slot) {
+    slotp = req.session.slot
+  }
+  if (req.body.cardnum != null && req.body.cardnum) {
+    cardnum = req.body.cardnum
+  }
+  if (req.session.seatString != null && req.session.seatString) {
+    seatString = req.session.seatString
+    req.session.seatString = null;
+  }
+  if (user){
+    userModel.getOne({_id:user},(err,client)=> {
+      if (err) throw err
+      if (client) {
+        seatModel.reserveSeats({status:"R",slot:slotp,owner:client},{$set: {status: "U",owner:ObjectId(user)}},(err,result) => {
+          if (err) throw err
+          if (result) {
+                slotModel.getMovie({_id:slotp},(err,slot) => {
+                  if (err) throw err
+                  if (slot) {
+                    console.log(':(')
+                    transactionModel.create({date:date,creditCardNum:cardnum,client:ObjectId(user),screening:ObjectId(slot.screening),slot:ObjectId(slotp),seats:seatString},(err,fin) =>{
+                      if (err) throw err
+                      res.send(fin)
+                    })
+                  }
+                })
+          }
+        })
+      }
+    })
+  }
+}
 // post function - cancel seats
 exports.cancelSeats = (req,res) => {
-    console.log(req.session)
     var user;
     var slotp;
     if (req.session.fullname != null)
