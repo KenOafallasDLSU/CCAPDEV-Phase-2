@@ -96,6 +96,23 @@ exports.userLogin = (req, res) => {
 /*
 Header
 */
+//user profile page navigation
+exports.displayProfilePage = (req, res) => {
+    userModel.getOne({_id: req.session.user}, (err, result) => {
+
+      res.render('BigBrain_Profile', {
+        user: result.full_name,
+        fullname: result.full_name,
+        pageCSS: "BigBrain_Profile",
+        pageJS: "BigBrain_Profile",
+        pageTitle: "User Profile",
+        header: "header",
+        footer: "footer",
+        email: result.email
+      });
+    });
+};
+
 //user logout function
 exports.userLogout = (req, res) => {
   if(req.session){
