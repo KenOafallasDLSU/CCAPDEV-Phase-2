@@ -275,6 +275,7 @@ app.get('/transactions', async (req,res) => {
 
   res.render('BigBrain_TransactionHistory', {
     user: req.session.fullname,
+    user_email: req.session.email,
     pageCSS: "BigBrain_TransactionHistory",
     pageTitle: "Transaction History",
     header: "header",

@@ -70,6 +70,7 @@ exports.userLogin = (req, res) => {
             if (result) {
               req.session.user = user._id;
               req.session.fullname = user.full_name;
+              req.session.email = user.email;
               req.session.type = user.usertype;
               if (user.usertype == 'C')
                 res.redirect('/movies');
@@ -96,7 +97,7 @@ exports.userLogin = (req, res) => {
 /*
 Header
 */
-//user profile page navigation
+//user profile page navigation (removed for now)
 exports.displayProfilePage = (req, res) => {
     userModel.getOne({_id: req.session.user}, (err, result) => {
 
