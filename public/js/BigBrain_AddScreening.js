@@ -50,7 +50,7 @@ function ratingError(){
 
 //Poster
 function posterError(){
-    if($("#posterSubmit").val()==""){
+    if($("#posterSubmit").val()=="..."){
         $("#posterAlert").text("Poster field is required!");
         $("#posterAlert").addClass("alert alert-danger col-8");
     }
@@ -148,6 +148,16 @@ function checkEmployeeForm() {
 }
 
 $(document).ready(function() {
+
+    $.get("filenames", (data, status) => {
+        //console.log(data[0].filename)
+        data.forEach((item, i) => {
+            console.log("Kenneth")
+            //console.log(item[i])
+            $('<option/>').val(item.filename).html(item.filename).appendTo('#posterSubmit');
+        })
+    })
+
     //Screen Number
     // $("#screenNumberSubmit").focusin(function(){
     //     screenNumberError();
@@ -239,7 +249,7 @@ $(document).ready(function() {
     // });
 
     $("#posterSubmit").focusout(function(){
-        if($("#posterSubmit").val()!=""){
+        if($("#posterSubmit").val()!="..."){
             $("#posterAlert").html("");
             $("#posterAlert").removeClass("alert alert-danger col-8");
         }
@@ -375,7 +385,7 @@ $(document).ready(function() {
             var date = $("#dateSubmit").val(); //cast to date
             var title = $("#titleSubmit").val();
             var desc = $("#descSubmit").val();
-            //var poster = ;
+            var poster = $("#posterSubmit").val();
             var price = $("#priceSubmit").val(); //cast to int
             var duration = $("#durationSubmit").val(); //cast to int
             var time1start = $("#timeStartSubmit1").val();
@@ -391,7 +401,7 @@ $(document).ready(function() {
                 date: new Date(date),
                 title: title,
                 desc: desc,
-                //poster no poster
+                poster: poster,
                 price: parseFloat(price),
                 duration: parseInt(duration),
                 time1start: time1start,

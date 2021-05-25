@@ -73,3 +73,7 @@ exports.getOne = (query, next) => {
 exports.getOneAsync = (query) => {
   return screeningModel.findOne(query).exec()
 };
+
+exports.addOneAsync = (data) => {
+  return screeningModel.create(data)
+}

@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const userController = require('../controllers/userController');
 const screeningController = require('../controllers/screeningController');
+const {isCustomer, isEmp} = require('../middlewares/checkRoutes.js');
 const {userRegisterValidation, userLoginValidation} = require('../validators.js');
 
 /*
@@ -16,7 +17,9 @@ router.post('/user-login', userLoginValidation, userController.userLogin);
 /*
   Header
 */
-//post functions
+//get functions
+router.get('/profile', isCustomer, userController.displayProfilePage);
 router.get('/logout', userController.userLogout);
+//post functions
 
 module.exports = router;

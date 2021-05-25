@@ -10,6 +10,8 @@ const {isEmp} = require('../middlewares/checkRoutes.js')
 router.get('/movies', screeningController.displayMoviesPage);
 
 router.get('/employeeFacing', isEmp, screeningController.renderEmployeeFacing);
+router.get('/screeningForm', isEmp, screeningController.renderAddScreening);
+router.get('/posterForm', isEmp, screeningController.renderAddPoster);
 router.post('/addScreening', isEmp, screeningController.addScreening)
 
 module.exports = router;
