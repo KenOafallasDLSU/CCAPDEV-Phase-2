@@ -109,9 +109,17 @@ const storage = new GridFsStorage({
 const upload = multer({ storage });
 
 app.post('/upload', upload.single('posterSubmit'), (req, res) => {
-  // res.json({ file: req.file });
-  // res.redirect('/');
+  //res.redirect('/employeeFacing');
 });
+
+app.get('/filenames', (req,res) => {
+  gfs.files.find().toArray((err, files) => {
+    if(!files || files.length === 0)
+      return -1
+    else
+      return res.json(files)
+  })
+})
 
 // @route GET /image/:filename
 // @desc Display Image
