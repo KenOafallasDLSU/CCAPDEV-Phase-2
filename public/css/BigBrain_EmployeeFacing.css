@@ -1,21 +1,27 @@
 #pageTitle{
     padding-top: 20px;
-}
-
-#screenUpdateForm{
-    padding-top: 20px;
-    padding-bottom: 20px;
-}
-
-#footerLinks{
-    padding-top: 30px;
+    padding-bottom: 40px;
 }
 
 .my-button{
     background-color: #3E6F71;
-  border-color: #3E6F71;
+    border-color: #3E6F71;
 }
 
-label {
-    font-weight: bold;
+.my-button:hover{
+    background-color: #223c3d;
+    border-color: #223c3d;
+}
+
+.button-div{
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+#info{
+    padding-bottom: 40px;
+}
+
+.footer{
+    position:absolute;
 }

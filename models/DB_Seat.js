@@ -46,3 +46,7 @@ exports.reserveSeats = (query, update, next) => {
         next(err, result)
     });
 }
+
+exports.addManyAsync = (data) => {
+    return seatsModel.insertMany(data)
+}

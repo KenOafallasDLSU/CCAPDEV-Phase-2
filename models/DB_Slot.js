@@ -37,3 +37,7 @@ exports.getMovie = (query, next) => {
       next(err, slot);
   });
 };
+
+exports.addManyAsync = (data) => {
+  return slotModel.insertMany(data)
+}

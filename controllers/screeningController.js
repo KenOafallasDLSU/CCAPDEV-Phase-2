@@ -58,88 +58,108 @@ exports.displayMoviesPage = (req, res) => {
   });
 };
 
-exports.renderEmployeeFacing = (req, res) => {
-  res.render("BigBrain_EmployeeFacing", {
+exports.renderAddScreening = (req, res) => {
+  res.render("BigBrain_AddScreening", {
     //header
     user: req.session.fullname,
 
     //head
-    pageCSS: "BigBrain_EmployeeFacing",
-    pageJS: "BigBrain_EmployeeFacing",
+    pageCSS: "BigBrain_AddScreening",
+    pageJS: "BigBrain_AddScreening",
     pageTitle: "Add Screening",
     header: "BigBrain_EmployeeHeader",
     footer: "BigBrain_EmployeeFooter"
   });
 }
 
-exports.addScreening = (req, res) => {
-  //   const screening = new screeningModel({
-//     date: req.body.date,
-//     screenNum: req.body.screenNum,
-//     title: req.body.title,
-//     posterUrl: req.body.poster,
-//     desc: req.body.desc,
-//     rating: req.body.rating,
-//     duration: req.body.duration,
-//     price: req.body.price,
-//     time1: req.body.time1start,
-//     time2: req.body.time2start,
-//     time3: req.body.time3start
-//   });
+exports.renderAddPoster = (req, res) => {
+  res.render("BigBrain_AddPoster", {
+    //header
+    user: req.session.fullname,
 
-//   screeningModel.insertOne(screening, function(err, res1) {
-//     if (err) throw err;
-//     const screeningId = res1.ops[0]
+    //head
+    pageCSS: "BigBrain_AddPoster",
+    pageJS: "BigBrain_AddPoster",
+    pageTitle: "Add Poster",
+    header: "BigBrain_EmployeeHeader",
+    footer: "BigBrain_EmployeeFooter"
+  });
+}
 
-//     const slot1 = new slotModel({
-//       screening: screeningId,
-//       slotOrder: 1,
-//       slotStart: req.body.time1start,
-//       slotEnd: req.body.time1end
-//     });
-//     const slot2 = new slotModel({
-//       screening: screeningId,
-//       slotOrder: 2,
-//       slotStart: req.body.time2start,
-//       slotEnd: req.body.time2end
-//     });
-//     const slot3 = new slotModel({
-//       screening: screeningId,
-//       slotOrder: 3,
-//       slotStart: req.body.time3start,
-//       slotEnd: req.body.time3end
-//     });
+exports.renderEmployeeFacing = (req, res) => {
+  userModel.getOne({_id: req.session.user}, (err, result) => {
+    res.render("BigBrain_EmployeeFacing", {
+      //header
+      user: req.session.fullname,
 
-//     dbo.collection("slots").insertMany([slot1, slot2, slot3], function(err, res2) {
-//       if (err) throw err;
+      //head
+      pageCSS: "BigBrain_EmployeeFacing",
+      pageJS: "BigBrain_EmployeeFacing",
+      pageTitle: "Employee Home",
+      header: "BigBrain_EmployeeHeader",
+      footer: "BigBrain_EmployeeFooter",
 
-//       console.log(res2)
+      //body
+      name: req.session.fullname,
+      email:  result.email
+    });
+  })
+}
 
-//       let aSeats = [];
-//       let letter = 'A';
-//       let number = 1;
+exports.addScreening = async (req, res) => {
+  const screening = {
+    date: req.body.date,
+    screenNum: req.body.screenNum,
+    title: req.body.title,
+    posterUrl: req.body.poster,
+    desc: req.body.desc,
+    rating: req.body.rating,
+    duration: req.body.duration,
+    price: req.body.price
+  }
+  const screeningId = await screeningModel.addOneAsync(screening)
+  console.log(screeningId)
 
-//       for(let slotNum = 0; slotNum < 3; slotNum++){
-//         letter = 'A';
-//         number = 1;
+  const slot1 = {
+    screening: screeningId,
+    slotOrder: 1,
+    slotStart: req.body.time1start,
+    slotEnd: req.body.time1end
+  }
+  const slot2 = {
+    screening: screeningId,
+    slotOrder: 2,
+    slotStart: req.body.time2start,
+    slotEnd: req.body.time2end
+  }
+  const slot3 = {
+    screening: screeningId,
+    slotOrder: 3,
+    slotStart: req.body.time3start,
+    slotEnd: req.body.time3end
+  }
+  const slotIdList = await slotModel.addManyAsync([slot1, slot2, slot3])
+  console.log(slotIdList)
 
-//         for(let i = 0; i < 10; i++){
-//           for(let j = 0; j < 10; j++){
-//             const tempSeat = seatModel({
-//               seatNum: String.fromCharCode(letter.charCodeAt() + i).concat(number + j),
-//               status: "A",
-//               slot: result2[slotNum]._id
-//             });
+  let aSeats = [];
+  let letter = 'A';
+  let number = 1;
+  for(let slotNum = 0; slotNum < 3; slotNum++){
+    letter = 'A';
+    number = 1;
 
-//             aSeats.push(tempSeat);
-//           }
-//         }
-//       }
+    for(let i = 0; i < 10; i++){
+      for(let j = 0; j < 10; j++){
+        const tempSeat = {
+          seatNum: String.fromCharCode(letter.charCodeAt() + i).concat(number + j),
+          status: "A",
+          slot: slotIdList[slotNum]
+        }
 
-//       dbo.collection("seats").insertMany(aSeats, function(err, res3) {
-//         if (err) throw err;
-//         //console.log("300 seats inserted");
-//       });
-//     });
-//   });
+        aSeats.push(tempSeat);
+      }
+    }
+  }
+  const seatsIdList = await seatModel.addManyAsync(aSeats)
+  console.log(seatsIdList)
 }

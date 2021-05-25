@@ -1,157 +1,23 @@
-<!-- Modal -->
-<div class="modal fade" id="completeModal" tabindex="-1" role="dialog" aria-labelledby="completeModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Success!</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        Movie Screening successfully added!
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary my-button" data-dismiss="modal">Confirm</button>
-      </div>
+<div class="container">
+  <h1 id="pageTitle">Employee Information</h1>
+
+  <div id="info">
+    <h3>
+      Name: {{name}}
+    </h3>
+    <h3>
+      Email: {{email}}
+    </h3>
+  </div>
+  
+  <div id="links">
+    <div class="button-div">
+      <a href="/screeningForm" class="btn btn-primary my-button">Add Screening</a>
+    </div>
+    
+    <div class="button-div">
+      <a href="/posterForm" class="btn btn-primary my-button">Add Poster</a>
     </div>
   </div>
+  
 </div>
-
-        <div class="container">
-            <h1 id="pageTitle">Add Movie Information for a Specific Screening</h1>
-
-            <!--Screen Update Form-->
-            <form name="screenUpdateForm" id="screenUpdateForm" onsubmit="return checkEmployeeForm()"
-                  action="/upload" method="POST" enctype="multipart/form-data">
-                <div class="form-row">
-                    <!--Screen Number-->
-                    <div class="form-group col-2">
-                        <label for="screenNumberSubmit">Screen Number</label>
-                        <select class="form-control" id="screenNumberSubmit" name="screenNumberSubmit">
-                            <option>...</option>
-                            <option>1</option>
-                            <option>2</option>
-                            <option>3</option>
-                            <option>4</option>
-                        </select>
-                    </div>
-
-                    <!--Date-->
-                    <div class="form-group col-3">
-                        <label for="dateSubmit">Date</label>
-                        <input type="date" class="form-control" id="dateSubmit" name="dateSubmit">
-                    </div>
-                </div>
-                <div id="screenNumberAlert" role="alert">
-                </div>
-                <div id="dateAlert" role="alert">
-                </div>
-
-                <!--Title-->
-                <div class="form-group">
-                    <label for="titleSubmit">Title</label>
-                    <input type="text" class="form-control col-8" id="titleSubmit" name="titleSubmit">
-                </div>
-                <div id="titleAlert" role="alert">
-                </div>
-
-                <!--Poster-->
-                <div class="form-group">
-                    <label for="posterSubmit">Poster</label>
-                    <input type="file" class="form-control-file" id="posterSubmit" name="posterSubmit" accept="image/*">
-                </div>
-                <div id="posterAlert" role="alert">
-                </div>
-
-                <!--Description-->
-                <div class="form-group">
-                    <label for="descSubmit">Description</label>
-                    <textarea rows="3" class="form-control col-8" id="descSubmit" name="descSubmit"></textarea>
-                </div>
-                <div id="descAlert" role="alert">
-                </div>
-
-                <!--Rating-->
-                <div class="form-group">
-                    <label for="ratingSubmit">Rating</label>
-                    <select class="form-control col-2" id="ratingSubmit" name="ratingSubmit">
-                        <option>...</option>
-                        <option>G</option>
-                        <option>G-TV</option>
-                        <option>PG</option>
-                        <option>PG-TV</option>
-                        <option>R-13</option>
-                        <option>SPG</option>
-                        <option>R-16</option>
-                        <option>R-18</option>
-                        <option>X</option>
-                    </select>
-                </div>
-                <div id="ratingAlert" role="alert">
-                </div>
-
-                <!--Duration-->
-                <div class="form-group">
-                    <label for="durationSubmit">Duration in Minutes</label>
-                    <input type="number" class="form-control col-2" id="durationSubmit" name="durationSubmit">
-                </div>
-                <div id="durationAlert" role="alert">
-                </div>
-
-                <!--Price-->
-                <div class="form-group">
-                    <label for="priceSubmit">Price</label>
-                    <input type="number" class="form-control col-2" id="priceSubmit" name="priceSubmit">
-                </div>
-                <div id="priceAlert" role="alert">
-                </div>
-
-                <!--Time Slot 1-->
-                <div class="form-row">
-                    <div class="form-group col-2">
-                        <label for="timeStartSubmit1">Time Slot 1 Start</label>
-                        <input type="time" class="form-control" id="timeStartSubmit1" name="timeStartSubmit1">
-                        
-                    </div>
-                    <div class="form-group col-2">
-                        <label for="timeEndSubmit1">Time Slot 1 End</label>
-                        <input type="time" class="form-control" id="timeEndSubmit1" name="timeEndSubmit1">
-                    </div>
-                </div>
-                <div id="time1Alert" role="alert">
-                </div>
-
-                <!--Time Slot 2-->
-                <div class="form-row">
-                    <div class="form-group col-2">
-                        <label for="timeStartSubmit2">Time Slot 2 Start</label>
-                        <input type="time" class="form-control" id="timeStartSubmit2" name="timeStartSubmit2">
-                        
-                    </div>
-                    <div class="form-group col-2">
-                        <label for="timeEndSubmit2">Time Slot 2 End</label>
-                        <input type="time" class="form-control" id="timeEndSubmit2" name="timeEndSubmit3">
-                    </div>
-                </div>
-                <div id="time2Alert" role="alert">
-                </div>
-
-                <!--Time Slot 3-->
-                <div class="form-row">
-                    <div class="form-group col-2">
-                        <label for="timeStartSubmit3">Time Slot 3 Start</label>
-                        <input type="time" class="form-control" id="timeStartSubmit3" name="timeStartSubmit3"> 
-                        
-                    </div>
-                    <div class="form-group col-2">
-                        <label for="timeEndSubmit3">Time Slot 3 End</label>
-                        <input type="time" class="form-control" id="timeEndSubmit3" name="timeEndSubmit3">
-                    </div>
-                </div>
-                <div id="time3Alert" role="alert">
-                </div>
-
-                <button type="submit" class="btn btn-primary my-button" id="employeeSubmit">Save Changes</button>
-            </form>
-        </div>
