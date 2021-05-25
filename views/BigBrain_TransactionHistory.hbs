@@ -16,7 +16,29 @@
 <br>
 <div class='container'>
     {{#if transactions}}
-    <div class = 'wrapper'>
+    <table class = "table table-striped">
+        <thead>
+            <tr>
+                <th scope = "col">Movie</th>
+                <th scope = "col">Date</th>
+                <th scope = "col">Seats</th>
+                <th scope = "col">Slot</th>
+                <th scope = "col">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each transactions}}
+            <tr>
+                <th scope = "row">{{title}}</th>
+                <td>{{date}}</td>
+                <td>{{seats}}</td>
+                <td>{{start}}-{{end}}</td>
+                <td>{{status}}</td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+    {{!-- <div class = 'wrapper'>
         <div class = 'movie head'>
             Movie
         </div>
@@ -49,14 +71,10 @@
             {{status}}
         </div>
         {{/each}}
-    </div>
+    </div> --}}
     {{else}}
     You have not yet done any transactions.
     {{/if}}
 </div>
 
-<br><br><br><br><br>
-<br><br><br><br><br>
-<br><br><br><br><br>
-<br><br><br><br><br>
 <br><br><br><br><br>
