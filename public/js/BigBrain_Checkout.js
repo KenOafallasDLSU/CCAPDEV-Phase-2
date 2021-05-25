@@ -23,7 +23,10 @@ $(document).ready(function () {
         $("#credAlert").html("");
         $("#credAlert").removeClass("alert alert-danger col-12");
         if (checkCreditCardNum()) {
-            window.location = '/transactions';
+            console.log('beep')
+            $.post('/transactions/createTransaction',{cardnum:$('#cardnum').val()}, function(req,res) {
+            })
+            window.location = '/movies';
         }
     })
     $('#cancel').click(function(){
@@ -33,7 +36,7 @@ $(document).ready(function () {
 
 
             //console.log(reservedSeats)
-        $.post("/cancelSeats", function(req, res) {
+        $.post("/transactions/cancelSeats", function(req, res) {
         })
         window.location = '/movies';
     })
