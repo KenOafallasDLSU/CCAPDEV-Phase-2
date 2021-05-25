@@ -9,7 +9,7 @@ const {validationResult} = require('express-validator');
   Movies Page
 */
 //Movies page display
-exports.displayMoviesPage = (req, res) => {
+exports.displayMoviesPage = async (req, res) => {
   var today = new Date(2020, 4, 9); //hardcoded dates
   var tom = new Date(2020, 4, 10);
   var next = new Date(2020, 4, 11);
