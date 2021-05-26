@@ -1,5 +1,5 @@
 <div class='container'>
-			<h2><strong>Movie Screenings</strong></h2>
+			<h2><strong>Movie Screenings Today</strong></h2>
 			{{>messages}}
 
 <h4 class='text-muted'>{{date1}}</h4>
@@ -31,62 +31,8 @@
 {{else}}
 	<p>No movies available. Sorry for the inconvenience.</p>
 {{/if}}
-<h4 class='text-muted'>{{date2}}</h4>
-{{#if day2}}
-      {{#each day2}}
-			<div class='media'>
-        <a class='pull-left' href='#'>
-          <img class="media-object movie-img" src="image/{{this.posterUrl}}">
-        </a>
-        <div class='media-body para'>
-          <h4>{{this.title}}<small> Screen {{this.screenNum}}</small></h4>
-          <p>
-            Runtime: {{this.duration}} Minutes<br>
-            Rating: {{this.rating}}<br>
-            {{this.price}} PHP<br><br>
-						<strong>Timeslots:</strong><br>
-						{{#each this.slots}}
-            	<a class="slotlink slot-font" style='color: blue' slotid={{this._id}}>{{this.slotStart}} - {{this.slotEnd}}</a><br>
-						{{/each}}
-            <div class='text-justify text-muted'>
-              {{this.desc}}
-            </div>
-          </p>
-        </div>
-      </div>
-      <br>
-			<hr>
-      {{/each}}
-{{else}}
-	<p>No movies available. Sorry for the inconvenience.</p>
-{{/if}}
-<h4 class='text-muted'>{{date3}}</h4>
-{{#if day3}}
-      {{#each day3}}
-			<div class='media'>
-        <a class='pull-left' href='#'>
-          <img class="media-object movie-img" src="image/{{this.posterUrl}}">
-        </a>
-        <div class='media-body para'>
-          <h4>{{this.title}}<small> Screen {{this.screenNum}}</small></h4>
-          <p>
-            Runtime: {{this.duration}} Minutes<br>
-            Rating: {{this.rating}}<br>
-            {{this.price}} PHP<br><br>
-						<strong>Timeslots:</strong><br>
-						{{#each this.slots}}
-            	<a class="slotlink slot-font" style='color: blue' slotid={{this._id}}>{{this.slotStart}} - {{this.slotEnd}}</a><br>
-						{{/each}}
-            <div class='text-justify text-muted'>
-              {{this.desc}}
-            </div>
-          </p>
-        </div>
-      </div>
-      <br>
-			<hr>
-      {{/each}}
-{{else}}
-	<p>No movies available. Sorry for the inconvenience.</p>
-{{/if}}
+
+<br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br>
+<br><br><br><br>
 </div>

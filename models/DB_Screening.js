@@ -27,28 +27,7 @@ const screeningModel = mongoose.model('screenings', screeningSchema);
 
 // Get all screenings for movies page
 exports.forMovies = (query, next) => {
-  screeningModel.find(query).exec((err, screens) => {
-    if (err) throw err;
-    const screenObjects = [];
-    screens.forEach((doc, i) => {
-      slotModel.getAll({screening: doc._id}, (err, slots) => {
-        var sc = {
-          date: doc.date,
-          screenNum: doc.screenNum,
-          title: doc.title,
-          posterUrl: doc.posterUrl,
-          desc: doc.desc,
-          rating: doc.rating,
-          duration: doc.duration,
-          price: doc.price,
-          slots: slots
-        }
-        screenObjects.push(sc);
-        if ((i + 1) == screens.length)
-          next(err, screenObjects);
-      });
-    });
-  });
+  return screeningModel.find(query).exec();
 };
 
 // Get all screenings that fit the query

@@ -9,35 +9,51 @@ const {validationResult} = require('express-validator');
   Movies Page
 */
 //Movies page display
-exports.displayMoviesPage = (req, res) => {
-  var today = new Date(2020, 4, 9); //hardcoded dates
-  var tom = new Date(2020, 4, 10);
-  var next = new Date(2020, 4, 11);
-  var screens1 = [];
-  var screens2 = [];
-  var screens3 = [];
+exports.displayMoviesPage = async (req, res) => {
+  var today = new Date(2020, 4, 8); //hardcoded dates
   var username;
+  var result = await screeningModel.forMovies({date: today});
 
-    screeningModel.forMovies({date: today}, (err, result) => {
-        result.forEach(function(doc) {
-        screens1.push(doc);
-      });
-      console.log(screens1[0].slots);
-      screeningModel.forMovies({date: tom}, (err, result) => {
-          result.forEach(function(doc) {
-          screens2.push(doc);
-        });
-        screeningModel.forMovies({date: next}, (err, result) => {
-            result.forEach(function(doc) {
-            screens3.push(doc);
-        });
+  let loopPromise = () => {
+    return new Promise ((resolve, reject) => {
+      try {
+        var stuff = [];
+        if (result.length > 0) {
+            result.forEach(async function(doc, i) {
+            var slots = await slotModel.getAll({screening: doc._id});
+              var scn = {
+                _id: doc._id,
+                date: doc.date,
+                screenNum: doc.screenNum,
+                title: doc.title,
+                posterUrl: doc.posterUrl,
+                desc: doc.desc,
+                rating: doc.rating,
+                duration: doc.duration,
+                price: doc.price,
+                datetxt: doc.datetxt,
+                slots: slots
+              }
+              stuff.push(scn);
+              if (i == result.length -1) {
+                resolve(stuff);
+              }
+          });
+        } else {
+          resolve(stuff);
+        }
+      } catch(err) {
+        console.log(err);
+        reject([]);
+      }
+    });
+  }
 
+  var screens1 = await loopPromise();
         if (req.session.fullname != null && req.session.type == 'C')
           username= req.session.fullname;
         else
           username= "guest";
-
-          console.log(req.session);
 
           res.render('movies', {
             user: username,
@@ -47,15 +63,8 @@ exports.displayMoviesPage = (req, res) => {
             header: "header",
             footer: "footer",
             day1: screens1,
-            day2: screens2,
-            day3: screens3,
-            date1: today.toDateString(),
-            date2: tom.toDateString(),
-            date3: next.toDateString()
+            date1: today.toDateString()
           });
-      });
-    });
-  });
 };
 
 exports.renderAddScreening = (req, res) => {
