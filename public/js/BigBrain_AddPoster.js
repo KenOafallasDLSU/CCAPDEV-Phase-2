@@ -61,7 +61,7 @@ $(document).ready(function() {
             $("#modal-message").html("Uploading poster, do not navigate away...");
             $('#success-confirm').prop('disabled', true);
         },
-        success: function() {
+        complete: function() {
             $("#modal-message").html("Poster successfully uploaded!");
             $('#success-confirm').prop('disabled', false);
         }
