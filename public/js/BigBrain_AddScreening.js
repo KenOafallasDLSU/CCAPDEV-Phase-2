@@ -78,8 +78,8 @@ function priceError(){
 
 //Time1
 function time1Error(){
-    if($("#timeStartSubmit1").val()=="" || $("#timeEndSubmit1").val()==""){
-        $("#timeStartSubmit1, #timeEndSubmit1").css("border", "1px solid #B00000");
+    if($("#timeStartSubmit1").val()==""){
+        $("#timeStartSubmit1").css("border", "1px solid #B00000");
 
         $("#time1Alert").text("Time Slot 1 field is required!");
         $("#time1Alert").addClass("alert alert-danger col-8");
@@ -88,8 +88,8 @@ function time1Error(){
 
 //Time2
 function time2Error(){
-    if($("#timeStartSubmit2").val()=="" || $("#timeEndSubmit2").val()==""){
-        $("#timeStartSubmit2, #timeEndSubmit2").css("border", "1px solid #B00000");
+    if($("#timeStartSubmit2").val()==""){
+        $("#timeStartSubmit2").css("border", "1px solid #B00000");
 
         $("#time2Alert").text("Time Slot 2 field is required!");
         $("#time2Alert").addClass("alert alert-danger col-8");
@@ -98,8 +98,8 @@ function time2Error(){
 
 //Time3
 function time3Error(){
-    if($("#timeStartSubmit3").val()=="" || $("#timeEndSubmit3").val()==""){
-        $("#timeStartSubmit3, #timeEndSubmit3").css("border", "1px solid #B00000");
+    if($("#timeStartSubmit3").val()==""){
+        $("#timeStartSubmit3").css("border", "1px solid #B00000");
 
         $("#time3Alert").text("Time Slot 3 field is required!");
         $("#time3Alert").addClass("alert alert-danger col-8");
@@ -117,11 +117,11 @@ const clearInput = () => {
     $("#durationSubmit").val("")
     $("#priceSubmit").val("")
     $("#timeStartSubmit1").val("")
-    $("#timeEndSubmit1").val("")
+    //$("#timeEndSubmit1").val("")
     $("#timeStartSubmit2").val("") 
-    $("#timeEndSubmit2").val("")
+    //$("#timeEndSubmit2").val("")
     $("#timeStartSubmit3").val("")
-    $("#timeEndSubmit3").val("")
+    //$("#timeEndSubmit3").val("")
     $("#ratingSubmit").val("")
 }
 
@@ -147,21 +147,33 @@ function checkEmployeeForm() {
     return valid;
 }
 
+function getEndTime(start, duration) {
+    let end
+
+    let [sHour, sMin] = start.split(":")
+    let nHour = parseInt(sHour)
+    let nMin = parseInt(sMin)
+    let nDur = parseInt(duration)
+
+    nMin = nMin + nDur
+    nHour = (nHour + Math.floor(nMin/60)) % 24
+    nMin = nMin % 60
+
+    end = nHour.toString() + ":" + nMin.toString()
+
+    return end
+}
+
 $(document).ready(function() {
 
     $.get("filenames", (data, status) => {
         //console.log(data[0].filename)
         data.forEach((item, i) => {
-            console.log("Kenneth")
+            //console.log("Kenneth")
             //console.log(item[i])
             $('<option/>').val(item.filename).html(item.filename).appendTo('#posterSubmit');
         })
     })
-
-    //Screen Number
-    // $("#screenNumberSubmit").focusin(function(){
-    //     screenNumberError();
-    // });
 
     $("#screenNumberSubmit").focusout(function(){
         if($("#screenNumberSubmit").val()!="..."){
@@ -175,11 +187,6 @@ $(document).ready(function() {
         }
     });
 
-    //Date
-    // $("#dateSubmit").focusin(function(){
-    //     dateError();
-    // });
-
     $("#dateSubmit").focusout(function(){
         if($("#dateSubmit").val()!=""){
             $("#dateSubmit").css("border", "1px solid #ddd");
@@ -191,11 +198,6 @@ $(document).ready(function() {
             dateError();
         }
     });
-
-    //title
-    // $("#titleSubmit").focusin(function(){
-    //     titleError();
-    // });
 
     $("#titleSubmit").focusout(function(){
         if($("#titleSubmit").val()!=""){
@@ -209,11 +211,6 @@ $(document).ready(function() {
         }
     });
 
-    //desc
-    // $("#descSubmit").focusin(function(){
-    //     descError();
-    // });
-
     $("#descSubmit").focusout(function(){
         if($("#descSubmit").val()!=""){
             $("#descSubmit").css("border", "1px solid #ddd");
@@ -225,11 +222,6 @@ $(document).ready(function() {
             descError();
         }
     });
-
-    //rating
-    // $("#ratingSubmit").focusin(function(){
-    //     ratingError();
-    // });
 
     $("#ratingSubmit").focusout(function(){
         if($("#ratingSubmit").val()!="..."){
@@ -243,11 +235,6 @@ $(document).ready(function() {
         }
     });
 
-    //Poster
-    // $("#posterSubmit").focusin(function(){
-    //     posterError();
-    // });
-
     $("#posterSubmit").focusout(function(){
         if($("#posterSubmit").val()!="..."){
             $("#posterAlert").html("");
@@ -257,11 +244,6 @@ $(document).ready(function() {
             posterError();
         }
     });
-
-    //duration
-    // $("#durationSubmit").focusin(function(){
-    //     durationError();
-    // });
 
     $("#durationSubmit").focusout(function(){
         if($("#durationSubmit").val()!=""){
@@ -275,11 +257,6 @@ $(document).ready(function() {
         }
     });
 
-    //price
-    // $("#priceSubmit").focusin(function(){
-    //     priceError();
-    // });
-
     $("#priceSubmit").focusout(function(){
         if($("#priceSubmit").val()!=""){
             $("#priceSubmit").css("border", "1px solid #ddd");
@@ -292,14 +269,9 @@ $(document).ready(function() {
         }
     });
 
-    //Time1
-    // $("#timeStartSubmit1, #timeEndSubmit1").focusin(function(){
-    //     time1Error();
-    // });
-
-    $("#timeStartSubmit1, #timeEndSubmit1").focusout(function(){
-        if($("#timeStartSubmit1").val()!="" && $("#timeEndSubmit1").val()!=""){
-            $("#timeStartSubmit1, #timeEndSubmit1").css("border", "1px solid #ddd");
+    $("#timeStartSubmit1").focusout(function(){
+        if($("#timeStartSubmit1").val()!=""){
+            $("#timeStartSubmit1").css("border", "1px solid #ddd");
 
             $("#time1Alert").html("");
             $("#time1Alert").removeClass("alert alert-danger col-8");
@@ -309,14 +281,10 @@ $(document).ready(function() {
         }
     });
 
-    //Time2
-    // $("#timeStartSubmit2, #timeEndSubmit2").focusin(function(){
-    //     time2Error();
-    // });
 
-    $("#timeStartSubmit2, #timeEndSubmit2").focusout(function(){
-        if($("#timeStartSubmit2").val()!="" && $("#timeEndSubmit2").val()!=""){
-            $("#timeStartSubmit2, #timeEndSubmit2").css("border", "1px solid #ddd");
+    $("#timeStartSubmit2").focusout(function(){
+        if($("#timeStartSubmit2").val()!=""){
+            $("#timeStartSubmit2").css("border", "1px solid #ddd");
 
             $("#time2Alert").html("");
             $("#time2Alert").removeClass("alert alert-danger col-8");
@@ -326,14 +294,9 @@ $(document).ready(function() {
         }
     });
 
-    //Time3
-    // $("#timeStartSubmit3, #timeEndSubmit3").focusin(function(){
-    //     time3Error();
-    // });
-
-    $("#timeStartSubmit3, #timeEndSubmit3").focusout(function(){
-        if($("#timeStartSubmit3").val()!="" && $("#timeEndSubmit3").val()!=""){
-            $("#timeStartSubmit3, #timeEndSubmit3").css("border", "1px solid #ddd");
+    $("#timeStartSubmit3").focusout(function(){
+        if($("#timeStartSubmit3").val()!=""){
+            $("#timeStartSubmit3").css("border", "1px solid #ddd");
 
             $("#time3Alert").html("");
             $("#time3Alert").removeClass("alert alert-danger col-8");
@@ -357,44 +320,23 @@ $(document).ready(function() {
         time2Error();
         time3Error();
         ratingError();
-
-        /*
-        let freeScreen = false;
-        if(checkEmployeeForm() == true)
-        { 
-            //Convert date string to Date object 
-            var date = new Date($("#dateSubmit").val());
-
-            //Check if there are already 4 movies on the day 
-            $.post("searchScreensOnDay", {date: date}, function(data, status) {
-                var count = 0;
-                
-                data.forEach((item, i) => {
-                    count++;
-                });
-
-                if(count < 4)
-                    freeScreen = true;
-            });
-        }
-        */
         
         if(checkEmployeeForm()/*freeScreen*/ == true)
         {
-            var screenNum = $("#screenNumberSubmit").val(); //cast to int
-            var date = $("#dateSubmit").val(); //cast to date
-            var title = $("#titleSubmit").val();
-            var desc = $("#descSubmit").val();
-            var poster = $("#posterSubmit").val();
-            var price = $("#priceSubmit").val(); //cast to int
-            var duration = $("#durationSubmit").val(); //cast to int
-            var time1start = $("#timeStartSubmit1").val();
-            var time2start = $("#timeStartSubmit2").val();
-            var time3start = $("#timeStartSubmit3").val();
-            var time1end = $("#timeEndSubmit1").val();
-            var time2end = $("#timeEndSubmit2").val();
-            var time3end = $("#timeEndSubmit3").val();
-            var rating = $("#ratingSubmit").val();
+            let screenNum = $("#screenNumberSubmit").val(); //cast to int
+            let date = $("#dateSubmit").val(); //cast to date
+            let title = $("#titleSubmit").val();
+            let desc = $("#descSubmit").val();
+            let poster = $("#posterSubmit").val();
+            let price = $("#priceSubmit").val(); //cast to int
+            let duration = $("#durationSubmit").val(); //cast to int
+            let time1start = $("#timeStartSubmit1").val();
+            let time2start = $("#timeStartSubmit2").val();
+            let time3start = $("#timeStartSubmit3").val();
+            let time1end = getEndTime(time1start, duration) //= $("#timeEndSubmit1").val();
+            let time2end = getEndTime(time2start, duration) //= $("#timeEndSubmit2").val();
+            let time3end = getEndTime(time3start, duration) //= $("#timeEndSubmit3").val();
+            let rating = $("#ratingSubmit").val();
 
             var screeningInfo = {
                 screenNum: parseInt(screenNum),

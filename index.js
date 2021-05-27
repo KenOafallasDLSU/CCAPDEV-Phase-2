@@ -25,13 +25,6 @@ const port = envPort || 3000;
 const databaseURL = dbURL
 //const dbname = "BigBrainDB";
 
-//models
-const userModel = require('./models/DB_User');
-const screeningModel = require('./models/DB_Screening');
-const slotModel = require('./models/DB_Slot');
-const seatModel = require('./models/DB_Seat');
-const transactionModel = require('./models/DB_Transaction');
-
 //create engine
 app.engine('hbs', exphbs({
     extname: 'hbs',
