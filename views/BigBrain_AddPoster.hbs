@@ -8,7 +8,7 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <div class="modal-body">
+      <div class="modal-body" id="modal-message">
         Poster successfully uploaded!
       </div>
       <div class="modal-footer">
@@ -20,7 +20,7 @@
 
 <div class="container">
   <h1 id="pageTitle">Add Poster to Database</h1>
-  <form action="/upload" method="POST" enctype="multipart/form-data" onsubmit="return checkFile()" class="col-8"> 
+  <form id="submit-form" action="/upload" method="POST" enctype="multipart/form-data" onsubmit="return checkFile()" class="col-8"> 
     <div class="custom-file mb-3">
       <input type="file" name="posterSubmit" id="posterSubmit" class="custom-file-input">
       <label id="poster-label" for="file" class="custom-file-label">Choose File</label>

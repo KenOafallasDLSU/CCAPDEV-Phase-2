@@ -40,6 +40,27 @@ $(document).ready(function() {
   })
 
   $("#success-confirm").click(() => {
-    location.reload()
+    //location.reload()
+    $('#completeModal').modal({show: false})
   })
+
+  $("#submit-form").on("submit", function(e) {
+    e.preventDefault();
+    const form = $(this)[0];
+    const formData = new FormData(form);
+    $.ajax({
+        url: $(this).attr("action"),
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        beforeSend: function() {
+            $('#completeModal').modal({show: true})
+            $("#modal-message").html("Uploading...");
+        },
+        success: function(data) {
+            $("#modal-message").html("Poster successfully uploaded!");
+        }
+    });
+});
 })
