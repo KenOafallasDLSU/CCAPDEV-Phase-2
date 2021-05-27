@@ -1,4 +1,4 @@
-### CCAPDEV-Phase-2
+### CCAPDEV-Phase-3
 # s15-mp1
 
 # Big Brain Movies Movie Reservation System
@@ -12,18 +12,25 @@
 ---
 
 ## Features
-Phase 2 implements the following features:
+Phase 3 implements the following features:
 - all views
 - all routes and navigation between views
 - retrieval of all dynamic data from online MongoDB database
 - basic user authentication, access control and session data
-- data exchange of seat selection and checkout via db for display purposes
+- data exchange of seat selection and checkout
+- business logic and database functions
+- database populated through in-app processes
+- Heroku build
 
 Limitations:
-- database was populated manually and artificially, not checked for logic (apart from between seat selection and checkout for display purposes)
-- business logic not fully implemented i.e. checkout and add screening do not update database yet
-- local build only
-- MVC not fully implemented
+- multer-gridfs not in MVC
+
+---
+
+## Heroku App Link
+```
+https://bigbrainmovies.herokuapp.com/
+```
 
 ---
 
