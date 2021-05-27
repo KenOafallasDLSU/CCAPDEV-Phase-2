@@ -30,3 +30,6 @@ Phase 3 implements the following features:
 
 Limitations:
 - multer-gridfs not in MVC
+
+Notes:
+- date set static to May 8, 2020 for demo
