@@ -41,6 +41,8 @@ $(document).ready(function() {
 
   $("#success-confirm").click(() => {
     //location.reload()
+    $("#poster-label").html("")
+    $("#uploadPreview").attr("src","")
     $('#completeModal').modal({show: false})
   })
 
@@ -56,10 +58,9 @@ $(document).ready(function() {
         contentType: false,
         beforeSend: function() {
             $('#completeModal').modal({show: true})
-            $("#modal-message").html("Uploading...");
         },
-        success: function(data) {
-            $("#modal-message").html("Poster successfully uploaded!");
+        success: function() {
+            //$("#modal-message").html("Poster successfully uploaded!");
         }
     });
 });
