@@ -58,9 +58,12 @@ $(document).ready(function() {
         contentType: false,
         beforeSend: function() {
             $('#completeModal').modal({show: true})
+            $("#modal-message").html("Uploading poster, do not navigate away...");
+            $('#success-confirm').prop('disabled', true);
         },
         success: function() {
-            //$("#modal-message").html("Poster successfully uploaded!");
+            $("#modal-message").html("Poster successfully uploaded!");
+            $('#success-confirm').prop('disabled', false);
         }
     });
 });
