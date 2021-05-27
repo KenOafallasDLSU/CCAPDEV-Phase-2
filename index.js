@@ -113,6 +113,15 @@ app.post('/upload', upload.single('posterSubmit'), (req, res) => {
   // res.redirect('/');
 });
 
+app.get('/filenames', (req,res) => {
+  gfs.files.find().toArray((err, files) => {
+    if(!files || files.length === 0)
+      return -1
+    else
+      return res.json(files)
+  })
+})
+
 // @route GET /image/:filename
 // @desc Display Image
 app.get('/:prefix?/image/:filename', (req, res) => {
@@ -142,147 +151,13 @@ app.get('/:prefix?/image/:filename', (req, res) => {
 const userRouter = require('./routes/userRoutes');
 const screeningRouter = require('./routes/screeningRoutes');
 const seatRouter = require('./routes/seatRoutes')
+const transRouter = require('./routes/transactionRoutes');
 
 // use routes
 app.use('/', userRouter);
 app.use('/', screeningRouter);
 app.use('/seatSelection', seatRouter);
-
-/* checkout page */
-app.get('/checkout', isCustomer, function (req,res) {
-  var user
-  var username
-  var today = new Date(2020, 4, 9);
-  var sort = {seatNum: 1}
-  var slotp;
-  console.log(req.session)
-  if (req.session.fullname != null) {
-    user = req.session.user
-    username = req.session.fullname
-  }
-  else
-    user = false
-  if (req.session.slot != null) {
-    slotp = req.session.slot;
-  }
-  if (user) {
-    userModel.getOne({_id:user},(err,client) => {
-      if (err) throw err
-      if (client) {
-        seatModel.getUserSeats(client,slotp,sort,(err,seats)=> {
-          if (err) throw err
-          if (seats) {
-            var seatArray =[];
-            var mov = {};
-            seats.forEach(item => {
-              var seatObj = {};
-              seatObj['seatNum'] = item.seatNum
-              seatObj['id'] = item._id
-              seatArray.push(seatObj)
-            })
-            slotModel.getMovie({_id:slotp},(err,slot)=> {
-              if (err) throw err
-              console.log(slot)
-              if (slot){
-                screeningModel.getOne({_id:slot.screening},(err,screening) => {
-                  if (err) throw err
-                  if (screening) {
-                    var totalPrice = screening.price * seatArray.length
-                    console.log(seatArray)
-                    res.render('BigBrain_Checkout', {
-                      user: username,
-                      pageCSS: "BigBrain_Checkout",
-                      pageJS: "BigBrain_Checkout",
-                      pageTitle: "Checkout",
-                      header: "header",
-                      footer: "footer",
-                      seats: seatArray,
-                      title: screening.title,
-                      img: screening.posterUrl,
-                      slotStart: slot.slotStart,
-                      slotEnd: slot.slotEnd,
-                      cost: totalPrice
-                    })
-                  }
-                })
-              }
-            })
-          }
-        })
-      }
-    })
-  }
-})
-
-app.post('/cancelSeats',function(req,res) {
-  console.log(req.session)
-  var user;
-  var slotp;
-  if (req.session.fullname != null)
-    user = req.session.user
-  else
-    user = false
-  if (req.session.slot != null)
-    slotp = req.session.slot
-  if (user){
-    userModel.getOne({_id:user}, (err,client) => {
-      if (err) throw err
-      if (client) {
-        seatModel.reserveSeats({status:'R',slot:slotp,owner: client},{$set: {status: "A", owner: ObjectId('nilnilnilnil')}},(err,result) => {
-          if (err) throw err
-          res.send(result)
-        })
-      }
-    })
-  }
-})
-/* transaction history page */
-
-app.get('/transactions', async (req,res) => {
-  let user
-  const today = new Date(2020, 5, 8);
-  const sort = {date: 1}
-  if (req.session.fullname != null)
-    user = req.session.user
-  else
-    user = false
-
-  let getSingleTrans = element => {
-    return new Promise(async (resolve, reject) => {
-      const movie = await screeningModel.getOneAsync({_id:element.screening})
-      const result = await slotModel.getOne({_id:element.slot})
-      if (movie && result) {
-        resolve({
-          title: movie.title,
-          date: movie.datetxt,
-          seats: element.seats,
-          status: element.date < today ? 'Completed' : 'Reserved',
-          start: result.slotStart,
-          end: result.slotEnd
-        })
-        //console.log(transArray)
-      }
-    })
-  }
-
-  const transactions = await transactionModel.getUserTransactionsAsync(ObjectId(user), sort)
-  let getAllTrans = await Promise.all(
-    transactions.map(async element => {
-      let trans = await getSingleTrans(element)
-      return trans
-    })
-  )
-
-  res.render('BigBrain_TransactionHistory', {
-    user: req.session.fullname,
-    user_email: req.session.email,
-    pageCSS: "BigBrain_TransactionHistory",
-    pageTitle: "Transaction History",
-    header: "header",
-    footer: "footer",
-    transactions: getAllTrans
-  })
-})
+app.use('/transactions', transRouter);
 
 app.listen(port, function() {
   console.log('App listening at port ' + port);
